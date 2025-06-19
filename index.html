@@ -7,6 +7,26 @@
 </head>
 <body>
     <h1>Carbon Footprint Estimator</h1>
+    <h2>Transportation</h2>
+    <label for="transportType">Mode of transport:</label>
+    <select id="transportType" onchange="updateTransportInputs()">
+        <option value="car">Car</option>
+        <option value="bus">Bus</option>
+        <option value="train">Train</option>
+        <option value="bike">Bicycle</option>
+        <option value="walk">Walking</option>
+    </select>
+
+    <div id="transportInputs">
+        <label for="kmDriven">Distance (km):</label>
+        <input type="number" id="kmDriven" /><br><br>
+
+        <div id="carInputs">
+            <label for="fuelEfficiency">Fuel efficiency (liters per 100km):</label>
+            <input type="number" id="fuelEfficiency" />
+        </div>
+    </div>
+
     <h2>Driving</h2>
     <label for="kmDriven">Kilometers driven:</label>
     <input type="number" id="kmDriven" />
