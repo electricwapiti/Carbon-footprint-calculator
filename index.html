@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Calculator</title>
+</head>
+<body>
+    <h1>Carbon Footprint Estimator</h1>
+    <h2>Driving</h2>
+    <label for="kmDriven">Kilometers driven:</label>
+    <input type="number" id="kmDriven" />
+    <br><br>
+    <label for="fuelEfficiency">Fuel efficiency (liters per 100km):</label>
+    <input type="number" id="fuelEfficiency" />
+
+    <h2>Diet</h2>
+    <label for="diet">Select your weekly diet:</label>
+    <select id="diet" onchange="updateFoodFootprint()">
+        <option value="steak_only">Steak Only</option>
+        <option value="high_meat">High Meat Eater</option>
+        <option value="average">Average</option>
+        <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
+        <option value="pescitarian_wo_s">Pescitarian w/o shrimp</option>
+        <option value="vegetarian">Vegetarian</option>
+        <option value="vegan">Vegan</option>
+    </select>
+
+    <h2>Composting</h2>
+    <label for="bread">Bread (kg composted):</label>
+    <input type = "number" id = "bread" />
+    <br><br>
+    <label for = "produce">Produce (kg composted):</label>
+    <input type="number" id="produce" />
+    <br><br>
+    <label for="meat">Meat (kg composted):</label>
+    <input type="number" id="meat" />
+    <br><br>
+    <button onclick="calculate()">Calculate Footprint</button>"
+    
+    <div id="result">
+    <script>
+    function calculate() {
+        const kmDriven = parseFloat(document.getElementById("kmDriven").value) || 0;
+        const fuelEfficiency = parseFloat(document.getElementById("fuelEfficiency").value) || 0;
+        const bread = parseFloat(document.getElementById("bread").value) || 0;
+        const produce = parseFloat(document.getElementById("produce").value) || 0;
+        const meat = parseFloat(document.getElementById("meat").value) || 0;
+        const dietValue = document.getElementById("diet").value;
+
+        // Driving emissions: approx. 2.31 kg CO2 per liter of gasoline
+        const litersUsed = (kmDriven / 100) * fuelEfficiency;
+        const drivingEmissions = litersUsed * 2.31;
+
+        // Composting benefit: methane avoided (CH4), converted to CO2e over 100 years
+        const CH4_BREAD = 0.375;
+        const CH4_PRODUCE = 0.25;
+        const CH4_MEAT = 0.7;
+        const ESCAPE_FACTOR = 0.61; // 61% escapes
+        const GWP_100yr = 28;
+
+        const compostCH4 = (bread * CH4_BREAD + produce * CH4_PRODUCE 
+            + meat * CH4_MEAT) * ESCAPE_FACTOR;
+
+        const compostAvoidedCO2e = compostCH4 * GWP_100yr;
+
+        //Diet
+        const dietEmissionsMap = {
+            steak_only: 336,
+            high_meat: 40,
+            average: 25,
+            pescitarian_w_s: 22,
+            pescitarian_wo_s: 18,
+            vegetarian: 15,
+            vegan: 12
+        };
+        
+        const dietC02e = dietEmissionsMap[dietValue] || 0;
+        document.getElementById("result").innerHTML = `
+            Emissions from driving: <strong>${drivingEmissions.toFixed(2)} kg CO₂e</strong><br/>
+            Emissions avoided by composting: <strong>${compostAvoidedCO2e.toFixed(2)} kg CO₂e</strong><br/>
+            Emissions from diet: <strong>${dietC02e.toFixed(2)} kg CO₂e</strong>
+        `;
+    }  
+    function updateFoodFootprint() {
+        const diet = document.getElementById("diet").value;
+        const foodOutput = document.getElementById("foodOutput");
+        let emissions = 0;
+        switch(diet){
+            //TODO: do research about actual values
+            case "steak_only":
+                emissions = 336; //kg C02e per week
+                break;
+            case "high_meat":
+                emissions = 40; //kg C02e per week
+                break;
+            case "average":
+                emissions = 25; //kg C02e per week
+                break;
+            case "pescitarian_w_shrimp":
+                emissions = 22; //kg C02e per week
+                break;
+            case "pescitarian_wo_shrimp":
+                emissions = 18; //kg C02e per week
+                break;
+            case "vegetarian":
+                emissions = 15; //kg C02e per week
+                break;
+            case "vegan":
+                emissions = 12; //kg C02e per week
+                break;
+        }
+        foodOutput.textContent = emissions;
+    }
+    </script>
+</body>
+</html>
