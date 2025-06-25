@@ -1,5 +1,5 @@
 * {
-    background-color: white;
+    background-color: #def4c6ff; /* tea green */
 }
 
 
@@ -29,4 +29,25 @@ body {
     align-items: center;
     gap: 0.5em;
     justify-content: center;
+}
+
+/* Full screen centered layout */
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 1rem;
+}
+
+/* Responsive middle-third content */
+.content {
+  width: 100%;
+  max-width: 33.33vw;
+  min-width: 320px;
+  padding: 2rem;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: max-width 0.3s ease;
 }

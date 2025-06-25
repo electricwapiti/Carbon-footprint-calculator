@@ -8,6 +8,14 @@
 </head>
 <body>
     <h1>Carbon Footprint Estimator</h1>
+    <div class="inline-field">
+        <p>Select the time length of your lifestyle estimates:</p>
+        <select id="timeframe">
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+    </div>
     <h2>Transportation</h2>
     <div class="inline-field">
         <label for="transportType">Mode of transport:</label>
@@ -21,21 +29,22 @@
     </div>
 
     <div id="transportInputs">
-        <label for="kmDriven">Distance (km):</label>
+        <label for="kmDriven">Distance (km) <span id="distanceVerb"></span> in the last <span id="kmDrivenTimeframe"></span>:</label>
         <input type="number" id="kmDriven" /><br><br>
-
         <div id="carInputs">
             <label for="fuelEfficiency">Fuel efficiency (liters per 100km):</label>
             <input type="number" id="fuelEfficiency" />
         </div>
     </div>
+    <div style="margin-top: 0.5em; text-align: center;">
+        <button type="button">Add mode of transport</button>
+    </div>
 
     <h2>Driving</h2>
-    <label for="kmDriven">Kilometers driven:</label>
-    <input type="number" id="kmDriven" />
-    <br><br>
-    <label for="fuelEfficiency">Fuel efficiency (liters per 100km):</label>
-    <input type="number" id="fuelEfficiency" />
+    <div class="inline-field">
+        <label for="kmDriven">Kilometers driven <span id="kmDrivenTimeframe"></span>:</label>
+        <input type="number" id="kmDriven" />
+    </div>
 
     <h2>Diet</h2>
     <label for="diet">Select your weekly diet:</label>
@@ -48,28 +57,48 @@
         <option value="vegetarian">Vegetarian</option>
         <option value="vegan">Vegan</option>
     </select>
-
     <h2>Composting</h2>
-    <label for="bread">Bread (kg composted):</label>
-    <input type = "number" id = "bread" />
-    <br><br>
-    <label for = "produce">Produce (kg composted):</label>
-    <input type="number" id="produce" />
-    <br><br>
-    <label for="meat">Meat (kg composted):</label>
-    <input type="number" id="meat" />
-    <br><br>
     <div class="inline-field">
-        <button onclick="calculate()">Calculate Footprint</button>
-        <select id="timeframe">
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select>
+        <label for="bread">Bread (kg composted):</label>
+        
+        <label for="produce">Produce (kg composted):</label>
+        
+        <label for="meat">Meat (kg composted):</label>
+        
+    </div>
+    <div class="inline-field">
+        
+        <input type="number" id="bread" />
+        <input type="number" id="produce" />
+        <input type="number" id="meat" />
     </div>
     
-    <div id="result">
+    <div class="inline-field">
+        <button onclick="calculate()">Calculate Footprint</button>
+    </div>
+    
+    <div id="result"></div>
     <script>
+    function updateTransportInputs() {
+        const transportType = document.getElementById("transportType").value;
+        const carInputs = document.getElementById("carInputs");
+        if (transportType === "car") {
+            carInputs.style.display = "block";
+        } else {
+            carInputs.style.display = "none";
+        }
+    }
+
+    function updateDistanceVerb() {
+        const transportType = document.getElementById("transportType").value;
+        let verb = "driven";
+        if (transportType === "bus") verb = "ridden in bus";
+        else if (transportType === "train") verb = "ridden in train";
+        else if (transportType === "bike") verb = "biked";
+        else if (transportType === "walk") verb = "walked";
+        document.getElementById("distanceVerb").textContent = verb;
+    }
+
     function calculate() {
         const kmDriven = parseFloat(document.getElementById("kmDriven").value) || 0;
         const fuelEfficiency = parseFloat(document.getElementById("fuelEfficiency").value) || 0;
@@ -77,10 +106,18 @@
         const produce = parseFloat(document.getElementById("produce").value) || 0;
         const meat = parseFloat(document.getElementById("meat").value) || 0;
         const dietValue = document.getElementById("diet").value;
+        const timeframe = document.getElementById("timeframe").value;
 
+        // Emissions factors in kg CO2e per km (approximate values)
+        const emissionsPerKm = {
+            bus: 0.105,   // average bus
+            train: 0.041, // average train
+            bike: 0,      // bike
+            walk: 0       // walk
+        };
         // Driving emissions: approx. 2.31 kg CO2 per liter of gasoline
         const litersUsed = (kmDriven / 100) * fuelEfficiency;
-        const drivingEmissions = litersUsed * 2.31;
+        let drivingEmissions = litersUsed * 2.31;
 
         // Composting benefit: methane avoided (CH4), converted to CO2e over 100 years
         const CH4_BREAD = 0.375;
@@ -92,7 +129,7 @@
         const compostCH4 = (bread * CH4_BREAD + produce * CH4_PRODUCE 
             + meat * CH4_MEAT) * ESCAPE_FACTOR;
 
-        const compostAvoidedCO2e = compostCH4 * GWP_100yr;
+        let compostAvoidedCO2e = compostCH4 * GWP_100yr;
 
         //Diet
         const dietEmissionsMap = {
@@ -104,10 +141,21 @@
             vegetarian: 15,
             vegan: 12
         };
-        
-        const dietC02e = dietEmissionsMap[dietValue] || 0;
+        let dietC02e = dietEmissionsMap[dietValue] || 0;
+
+        // Apply timeframe multiplier
+        let multiplier = 1;
+        if (timeframe === "monthly") {
+            multiplier = 4.345;
+        } else if (timeframe === "yearly") {
+            multiplier = 52;
+        }
+        drivingEmissions *= multiplier;
+        compostAvoidedCO2e *= multiplier;
+        dietC02e *= multiplier;
+
         document.getElementById("result").innerHTML = `
-            Emissions from driving: <strong>${drivingEmissions.toFixed(2)} kg CO₂e</strong><br/>
+            Emissions from transportation: <strong>${drivingEmissions.toFixed(2)} kg CO₂e</strong><br/>
             Emissions avoided by composting: <strong>${compostAvoidedCO2e.toFixed(2)} kg CO₂e</strong><br/>
             Emissions from diet: <strong>${dietC02e.toFixed(2)} kg CO₂e</strong>
         `;
@@ -115,6 +163,7 @@
     function updateFoodFootprint() {
         const diet = document.getElementById("diet").value;
         const foodOutput = document.getElementById("foodOutput");
+        const timeframe = document.getElementById("timeframe").value;
         let emissions = 0;
         switch(diet){
             //TODO: do research about actual values
@@ -140,8 +189,36 @@
                 emissions = 12; //kg C02e per week
                 break;
         }
-        foodOutput.textContent = emissions;
+        let multiplier = 1;
+        if (timeframe === "monthly") {
+            multiplier = 4.345; // average weeks per month
+        } else if (timeframe === "yearly") {
+            multiplier = 52;
+        }
+        foodOutput.textContent = (emissions * multiplier).toFixed(2);
     }
+
+    function updateKmDrivenTimeframe() {
+        const timeframe = document.getElementById("timeframe").value;
+        let text = "week";
+        if (timeframe === "monthly") text = "month";
+        else if (timeframe === "yearly") text = "year";
+        document.getElementById("kmDrivenTimeframe").textContent = text;
+    }
+
+    document.getElementById("timeframe").addEventListener("change", function() {
+        updateKmDrivenTimeframe();
+        updateFoodFootprint();
+    });
+    document.getElementById("transportType").addEventListener("change", function() {
+        updateTransportInputs();
+        updateDistanceVerb();
+    });
+
+    // Call on page load
+    updateKmDrivenTimeframe();
+    updateTransportInputs();
+    updateDistanceVerb();
     </script>
 </body>
 </html>
