@@ -1,0 +1,32 @@
+* {
+    background-color: white;
+}
+
+
+/** todo: make this a React app, split everything into primary-tertiary styling
+/** primary  **/
+/** secondary  **/
+/** tertiary  **/
+
+/** 
+Primary: "tea green", #def4c6ff
+--tea-green: #def4c6ff;
+--dark-spring-green: #1c7c54ff;
+--cal-poly-green: #1b512dff;
+--celadon: #73e2a7ff;
+--yellow-green: #b1cf5fff;
+**/
+
+body {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.inline-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    justify-content: center;
+}

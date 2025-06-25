@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carbon Footprint Calculator</title>
+    <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
     <h1>Carbon Footprint Estimator</h1>
     <h2>Transportation</h2>
-    <label for="transportType">Mode of transport:</label>
-    <select id="transportType" onchange="updateTransportInputs()">
-        <option value="car">Car</option>
-        <option value="bus">Bus</option>
-        <option value="train">Train</option>
-        <option value="bike">Bicycle</option>
-        <option value="walk">Walking</option>
-    </select>
+    <div class="inline-field">
+        <label for="transportType">Mode of transport:</label>
+        <select id="transportType" onchange="updateTransportInputs()">
+            <option value="car">Car</option>
+            <option value="bus">Bus</option>
+            <option value="train">Train</option>
+            <option value="bike">Bicycle</option>
+            <option value="walk">Walking</option>
+        </select>
+    </div>
 
     <div id="transportInputs">
         <label for="kmDriven">Distance (km):</label>
@@ -56,7 +59,14 @@
     <label for="meat">Meat (kg composted):</label>
     <input type="number" id="meat" />
     <br><br>
-    <button onclick="calculate()">Calculate Footprint</button>"
+    <div class="inline-field">
+        <button onclick="calculate()">Calculate Footprint</button>
+        <select id="timeframe">
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+    </div>
     
     <div id="result">
     <script>
