@@ -17,34 +17,10 @@
         </select>
     </div>
     <h2>Transportation</h2>
-    <div class="inline-field">
-        <label for="transportType">Mode of transport:</label>
-        <select id="transportType" onchange="updateTransportInputs()">
-            <option value="car">Car</option>
-            <option value="bus">Bus</option>
-            <option value="train">Train</option>
-            <option value="bike">Bicycle</option>
-            <option value="walk">Walking</option>
-        </select>
-    </div>
-
-    <div id="transportInputs">
-        <label for="kmDriven">Distance (km) <span id="distanceVerb"></span> in the last <span id="kmDrivenTimeframe"></span>:</label>
-        <input type="number" id="kmDriven" /><br><br>
-        <div id="carInputs">
-            <label for="fuelEfficiency">Fuel efficiency (liters per 100km):</label>
-            <input type="number" id="fuelEfficiency" />
+        <div id="transportEntriesContainer"></div>
+        <div style="margin-top: 0.5em; text-align: center;">
+            <button type="button" onclick="addTransportEntry()">Add mode of transport</button>
         </div>
-    </div>
-    <div style="margin-top: 0.5em; text-align: center;">
-        <button type="button">Add mode of transport</button>
-    </div>
-
-    <h2>Driving</h2>
-    <div class="inline-field">
-        <label for="kmDriven">Kilometers driven <span id="kmDrivenTimeframe"></span>:</label>
-        <input type="number" id="kmDriven" />
-    </div>
 
     <h2>Diet</h2>
     <label for="diet">Select your weekly diet:</label>
@@ -60,14 +36,10 @@
     <h2>Composting</h2>
     <div class="inline-field">
         <label for="bread">Bread (kg composted):</label>
-        
         <label for="produce">Produce (kg composted):</label>
-        
         <label for="meat">Meat (kg composted):</label>
-        
     </div>
     <div class="inline-field">
-        
         <input type="number" id="bread" />
         <input type="number" id="produce" />
         <input type="number" id="meat" />
@@ -79,6 +51,72 @@
     
     <div id="result"></div>
     <script>
+    // Transport entries management
+    let transportEntries = [];
+    let nextTransportId = 1;
+    function addTransportEntry() {
+        const container = document.getElementById("transportEntriesContainer");
+        const id = nextTransportId++;
+        
+        // Default entry object
+        const entry = {
+            id,
+            mode: "car",
+            distance: 0,
+            fuelEfficiency: 0
+        };
+        transportEntries.push(entry);
+
+        const entryDiv = document.createElement("div");
+        entryDiv.className = "transport-entry";
+        entryDiv.id = `transport-${id}`;
+        entryDiv.innerHTML = `
+            <label>Mode:
+                <select onchange="updateTransportMode(${id}, this.value)">
+                    <option value="car">Car</option>
+                    <option value="bus">Bus</option>
+                    <option value="train">Train</option>
+                    <option value="bike">Bicycle</option>
+                    <option value="walk">Walking</option>
+                </select>
+            </label>
+            <label>Distance (km):
+                <input type="number" onchange="updateTransportDistance(${id}, this.value)">
+            </label>
+            <label id="fuel-eff-${id}">Fuel Efficiency (L/100km):
+                <input type="number" onchange="updateTransportFuel(${id}, this.value)">
+            </label>
+            <button type="button" onclick="removeTransportEntry(${id})">Remove</button>
+            <hr/>
+        `;
+        container.appendChild(entryDiv);
+    }
+
+    //Keep your array in sync with the UI
+    function updateTransportMode(id, mode) {
+    const entry = transportEntries.find(e => e.id === id);
+    if (entry) entry.mode = mode;
+
+    const fuelLabel = document.getElementById(`fuel-eff-${id}`);
+    fuelLabel.style.display = mode === "car" ? "inline-block" : "none";
+}
+
+    function updateTransportDistance(id, value) {
+        const entry = transportEntries.find(e => e.id === id);
+        if (entry) entry.distance = parseFloat(value) || 0;
+    }
+
+    function updateTransportFuel(id, value) {
+        const entry = transportEntries.find(e => e.id === id);
+        if (entry) entry.fuelEfficiency = parseFloat(value) || 0;
+    }
+
+    function removeTransportEntry(id) {
+        transportEntries = transportEntries.filter(e => e.id !== id);
+        const entryDiv = document.getElementById(`transport-${id}`);
+        if (entryDiv) entryDiv.remove();
+    }
+
     function updateTransportInputs() {
         const transportType = document.getElementById("transportType").value;
         const carInputs = document.getElementById("carInputs");
@@ -89,19 +127,7 @@
         }
     }
 
-    function updateDistanceVerb() {
-        const transportType = document.getElementById("transportType").value;
-        let verb = "driven";
-        if (transportType === "bus") verb = "ridden in bus";
-        else if (transportType === "train") verb = "ridden in train";
-        else if (transportType === "bike") verb = "biked";
-        else if (transportType === "walk") verb = "walked";
-        document.getElementById("distanceVerb").textContent = verb;
-    }
-
     function calculate() {
-        const kmDriven = parseFloat(document.getElementById("kmDriven").value) || 0;
-        const fuelEfficiency = parseFloat(document.getElementById("fuelEfficiency").value) || 0;
         const bread = parseFloat(document.getElementById("bread").value) || 0;
         const produce = parseFloat(document.getElementById("produce").value) || 0;
         const meat = parseFloat(document.getElementById("meat").value) || 0;
@@ -115,9 +141,19 @@
             bike: 0,      // bike
             walk: 0       // walk
         };
-        // Driving emissions: approx. 2.31 kg CO2 per liter of gasoline
-        const litersUsed = (kmDriven / 100) * fuelEfficiency;
-        let drivingEmissions = litersUsed * 2.31;
+        
+        let transportEmissions = 0;
+
+        for (const entry of transportEntries) {
+            const km = entry.distance || 0;
+
+            if (entry.mode === "car") {
+                const litersUsed = (km / 100) * (entry.fuelEfficiency || 0);
+                transportEmissions += litersUsed * 2.31;
+            } else {
+                transportEmissions += (emissionsPerKm[entry.mode] || 0) * km;
+            }
+        }
 
         // Composting benefit: methane avoided (CH4), converted to CO2e over 100 years
         const CH4_BREAD = 0.375;
@@ -150,12 +186,11 @@
         } else if (timeframe === "yearly") {
             multiplier = 52;
         }
-        drivingEmissions *= multiplier;
         compostAvoidedCO2e *= multiplier;
         dietC02e *= multiplier;
 
         document.getElementById("result").innerHTML = `
-            Emissions from transportation: <strong>${drivingEmissions.toFixed(2)} kg CO₂e</strong><br/>
+            Emissions from transportation: <strong>${transportEmissions.toFixed(2)} kg CO₂e</strong><br/>
             Emissions avoided by composting: <strong>${compostAvoidedCO2e.toFixed(2)} kg CO₂e</strong><br/>
             Emissions from diet: <strong>${dietC02e.toFixed(2)} kg CO₂e</strong>
         `;
@@ -212,13 +247,11 @@
     });
     document.getElementById("transportType").addEventListener("change", function() {
         updateTransportInputs();
-        updateDistanceVerb();
     });
 
     // Call on page load
     updateKmDrivenTimeframe();
     updateTransportInputs();
-    updateDistanceVerb();
     </script>
 </body>
 </html>
