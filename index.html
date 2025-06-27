@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.cdnfonts.com/css/atkinson-hyperlegible" rel="stylesheet">
     <title>Carbon Footprint Calculator</title>
     <link rel="stylesheet" href="./style.css" />
 </head>
@@ -19,7 +20,7 @@
     <h2>Transportation</h2>
         <div id="transportEntriesContainer"></div>
         <div style="margin-top: 0.5em; text-align: center;">
-            <button type="button" onclick="addTransportEntry()">Add mode of transport</button>
+            <button type="button" class="button" onclick="addTransportEntry()">Add mode of transport</button>
         </div>
 
     <h2>Diet</h2>
@@ -44,10 +45,7 @@
         <input type="number" id="produce" />
         <input type="number" id="meat" />
     </div>
-    
-    <div class="inline-field">
-        <button onclick="calculate()">Calculate Footprint</button>
-    </div>
+    <button class="button" onclick="calculate()">Calculate Footprint</button>
     
     <div id="result"></div>
     <script>
@@ -86,7 +84,7 @@
             <label id="fuel-eff-${id}">Fuel Efficiency (L/100km):
                 <input type="number" onchange="updateTransportFuel(${id}, this.value)">
             </label>
-            <button type="button" onclick="removeTransportEntry(${id})">Remove</button>
+            <button type="button" class="button" onclick="removeTransportEntry(${id})">Remove</button>
             <hr/>
         `;
         container.appendChild(entryDiv);

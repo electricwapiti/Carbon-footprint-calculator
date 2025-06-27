@@ -17,6 +17,10 @@ Primary: "tea green", #def4c6ff
 --yellow-green: #b1cf5fff;
 **/
 
+* {
+    font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif;
+}
+
 body {
     text-align: center;
     display: flex;
@@ -50,4 +54,26 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   transition: max-width 0.3s ease;
+}
+
+.button {
+    background-color: #1c7c54ff; /* dark spring green */
+    color: white;
+    border: none;
+    padding: 0.5em 1em;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #1b512dff; /* cal poly green */
+}
+
+.inline-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    justify-content: center;
+    padding: 0.5em;
 }
