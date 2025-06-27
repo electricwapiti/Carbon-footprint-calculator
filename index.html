@@ -175,7 +175,7 @@
             vegetarian: 15,
             vegan: 12
         };
-        let dietC02e = dietEmissionsMap[dietValue] || 0;
+        let dietCO2e = dietEmissionsMap[dietValue] || 0;
 
         // Apply timeframe multiplier
         let multiplier = 1;
@@ -185,12 +185,18 @@
             multiplier = 52;
         }
         compostAvoidedCO2e *= multiplier;
-        dietC02e *= multiplier;
+        dietCO2e *= multiplier;
 
+        // Sum total emissions (subtract composting benefit)
+        const totalEmissions = transportEmissions + dietCO2e - compostAvoidedCO2e;
         document.getElementById("result").innerHTML = `
-            Emissions from transportation: <strong>${transportEmissions.toFixed(2)} kg CO₂e</strong><br/>
-            Emissions avoided by composting: <strong>${compostAvoidedCO2e.toFixed(2)} kg CO₂e</strong><br/>
-            Emissions from diet: <strong>${dietC02e.toFixed(2)} kg CO₂e</strong>
+            <section class="result-section">
+                Emissions from transportation: <span class="calc-value">${transportEmissions.toFixed(2)} kg CO₂e</span><br/>
+                Emissions avoided by composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(2)} kg CO₂e</span><br/>
+                Emissions from diet: <span class="calc-value">${dietCO2e.toFixed(2)} kg CO₂e</span><br/>
+                <hr>
+                <strong>Total carbon footprint: <span class="calc-value">${totalEmissions.toFixed(2)} kg CO₂e</span></strong>
+            </section>
         `;
     }  
     function updateFoodFootprint() {
