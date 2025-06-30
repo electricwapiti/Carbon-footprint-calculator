@@ -77,7 +77,7 @@ Basic pie chart.
 Buy footprintcalc.com for $10/yr.
 
 ## Incremental Releases:
-Phase 2: July 17th: Add flights, purchases, & offset textbox if user knows offset amount.
+<br>Phase 2: July 17th: Add flights, purchases, & offset textbox if user knows offset amount.
 Phase 3: July 19th: Make it global. Measurement system support, language support and currency support.
 Phase 4: July 24th: Add local comparisons, Electricity Maps API, and offset integration.
 Phase 5: July 28th: Add footprint reduction analysis and debug major issues.
