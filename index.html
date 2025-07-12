@@ -214,9 +214,7 @@
         };
 
         let dietCO2e = dietEmissionsMap[dietValue] || 0;
-        const multiplier = multiply(diet_timeframe);
-        console.log("the diet multiplier found is " + multiplier);
-        dietCO2e *= multiplier;
+        dietCO2e = convertToYearly(diet_timeframe, dietCO2e);
         return dietCO2e;
       }
 
@@ -242,17 +240,21 @@
             transportCO2e += (emissionsPerKm[entry.mode] || 0) * km;
           }
         }
+
+        transportCO2e = convertToYearly(transport_timeframe, transportCO2e);
         return transportCO2e;
       }
 
-      //TODO: Split off the "composting benefit" part and make this be a food waste CO2e generator.
-      //Composting is less bad for the environment than landfill, not good.
-      //Only stuff from outside the household which wouldn't have been composted otherwise is 'good' for the environment.
       function calcFoodWaste() {
-        //Start with composting that wouldn't have been done without you.
+        // Placeholder — you'd insert your actual calculation logic
+        return 0; // or some calculated number
+      }
+
+      // Calculate the CO2e emissions avoided by composting food waste from outside the household.
+      // This is a societal emission reduction opportunity. TODO: add more opportunities (e.g. activism, lobbying, etc.) if you think of any.
+      function calcCompostAvoided() {
         const bread = parseFloat(document.getElementById("bread").value) || 0;
-        const produce =
-          parseFloat(document.getElementById("produce").value) || 0;
+        const produce = parseFloat(document.getElementById("produce").value) || 0;
         const meat = parseFloat(document.getElementById("meat").value) || 0;
 
         // Composting benefit: 100 yr CO2e of methane avoided
@@ -269,23 +271,27 @@
         let compostAvoidedCO2e = compostCH4 * GWP_100yr;
 
         //Find the selected timeframe and multiply it by that.
-        const foodwasteTimeframe = document.getElementById(
-          "foodwaste_timeframe"
-        ).value;
-        const multiplier = multiply(foodwasteTimeframe);
-        console.log("the food waste multiplier found is " + multiplier);
-        compostAvoidedCO2e *= multiplier;
+        const foodwasteTimeframe = document.getElementById("foodwaste_timeframe").value;
+        const yearlyEmissions = convertToYearly(foodwasteTimeframe);
+        console.log("the food waste yearly emissions is" + yearlyEmissions);
+        compostAvoidedCO2e = yearlyEmissions;
         return compostAvoidedCO2e;
       }
 
-      function multiply(timeframeElement) {
-        let multiplier = 1;
-        if (timeframeElement === "monthly") {
-          multiplier = 4.345;
-        } else if (timeframeElement === "yearly") {
-          multiplier = 52;
+      /**   
+       * Convert the input value to yearly emissions based on the selected timeframe.
+       * @param {string} timeframeElement - The selected timeframe (weekly, monthly, yearly).
+       * @param {number} inputValue - The input value to convert.
+       * @return {number} - The converted yearly emissions value.
+       */
+      function convertToYearly(timeframeElement, inputValue) {
+        let yearlyEmissions = inputValue;
+        if (timeframeElement === "weekly") {
+          yearlyEmissions *= 52;
+        } else if (timeframeElement === "monthly") {
+          yearlyEmissions *= 12;
         }
-        return multiplier;
+        return yearlyEmissions;
       }
 
       function updateFoodFootprint() {
@@ -314,8 +320,8 @@
             emissions = 12; //kg C02e per week
             break;
         }
-        multiplier = multiply(diet_timeframe.value);
-        foodOutput.textContent = (emissions * multiplier).toFixed(2);
+        multiplier = convertToYearly(timeframe);
+        //foodOutput.textContent = (emissions * multiplier).toFixed(2);
       }
 
       /** CalcFootprint is the main fxn for calculating the footprint.
@@ -330,6 +336,7 @@
         transportCO2e = calcTransit();
         dietCO2e = calcDiet();
         const foodwasteCO2e = calcFoodWaste();
+        const compostAvoidedCO2e = calcCompostAvoided();
 
         const totalEmissions =
           transportCO2e + dietCO2e + foodwasteCO2e - compostAvoidedCO2e;
