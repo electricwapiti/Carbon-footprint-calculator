@@ -34,12 +34,10 @@
     <div class="inline-field">
       <h2>Diet</h2>
     </div>
-    <label for="diet"
-      >Select your diet:</label
-    >
+    <label for="diet">Select your diet:</label>
     <select id="diet" onchange="updateFoodFootprint()">
       <option value="high_meat">High Meat Eater</option>
-      <option value="average">Average</option>
+      <option value="average" selected>Average</option>
       <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
       <option value="pescitarian_wo_s">Pescitarian w/o shrimp</option>
       <option value="vegetarian">Vegetarian</option>
@@ -96,19 +94,54 @@
       <p>Time length:</p>
       <select id="utilities_timeframe" onchange="updateTimeframe(this)">
         <option value="weekly">Weekly</option>
-        <option value="monthly">Monthly</option>
+        <option value="monthly" selected>Monthly</option>
         <option value="yearly">Yearly</option>
       </select>
-      <label for="electricity"
-        >How many KW do you use per
-        <span class="timeframe" id="electricityTimeframe"></span>?
-        <input
-          type="number"
-          id="electricity"
-          style="display: inline-block; width: auto; margin-left: 0.5em"
-        />
-      </label>
     </div>
+    <label for="electricity"
+      >How many KW do you use per
+      <span class="timeframe" data-for="utilities_timeframe"></span>?
+      <input
+        type="number"
+        id="electricity"
+        style="display: inline-block; width: auto; margin-left: 0.5em"
+      />
+    </label>
+    <label for="gas"
+      >How many m<sup>3</sup> of natural gas do you use per
+      <span class="timeframe" data-for="utilities_timeframe"></span>?
+      <input
+        type="number"
+        id="gas"
+        style="display: inline-block; width: auto; margin-left: 0.5em"
+      />
+    </label>
+    <label for="water"
+      >How many liters of water do you use per
+      <span class="timeframe" data-for="utilities_timeframe"></span>?
+      <input
+        type="number"
+        id="water"
+        style="display: inline-block; width: auto; margin-left: 0.5em"
+      />
+    </label>
+    <div class="inline-field">
+      <p>Where do you get your utilities from?</p>
+      <label for="country">Country:</label>
+      <select id="country" onchange="updateRegions()">
+        <option value="">-- Select Country --</option>
+        <option value="USA">United States</option>
+        <option value="CAN">Canada</option>
+        <option value="MEX">Mexico</option>
+        <option value="TAI">Taiwan</option>
+        <option value="NET">Netherlands</option>
+      </select>
+      <label for="region">Region:</label>
+      <select id="region">
+        <option value="">-- Select Region --</option>
+      </select>
+    </div>
+
     <button class="button" onclick="calcFootprint()">
       Calculate Footprint
     </button>
@@ -266,7 +299,8 @@
       // This is a societal emission reduction opportunity. TODO: add more opportunities (e.g. activism, lobbying, etc.) if you think of any.
       function calcCompostAvoided() {
         const bread = parseFloat(document.getElementById("bread").value) || 0;
-        const produce = parseFloat(document.getElementById("produce").value) || 0;
+        const produce =
+          parseFloat(document.getElementById("produce").value) || 0;
         const meat = parseFloat(document.getElementById("meat").value) || 0;
 
         // Composting benefit: 100 yr CO2e of methane avoided
@@ -283,14 +317,16 @@
         let compostAvoidedCO2e = compostCH4 * GWP_100yr;
 
         //Find the selected timeframe and multiply it by that.
-        const foodwasteTimeframe = document.getElementById("foodwaste_timeframe").value;
+        const foodwasteTimeframe = document.getElementById(
+          "foodwaste_timeframe"
+        ).value;
         const yearlyEmissions = convertToYearly(foodwasteTimeframe);
         console.log("the food waste yearly emissions is" + yearlyEmissions);
         compostAvoidedCO2e = yearlyEmissions;
         return compostAvoidedCO2e;
       }
 
-      /**   
+      /**
        * Convert the input value to yearly emissions based on the selected timeframe.
        * @param {string} timeframeElement - The selected timeframe (weekly, monthly, yearly).
        * @param {number} inputValue - The input value to convert.
@@ -339,21 +375,27 @@
        * returns: none
        **/
       function calcFootprint() {
-        console.log("✅ Calculate Footprint button was pressed");
-        console.log("Calculating carbon footprint...");
         transportCO2e = calcTransit();
         dietCO2e = calcDiet();
-        const foodwasteCO2e = calcFoodWaste();
-        const compostAvoidedCO2e = calcCompostAvoided();
+        utilitiesCO2e = 0; // TODO: Implement utilities calculation
+        foodwasteCO2e = calcFoodWaste();
+        compostAvoidedCO2e = calcCompostAvoided();
 
         const totalEmissions =
-          transportCO2e + dietCO2e + foodwasteCO2e - compostAvoidedCO2e;
+          transportCO2e +
+          utilitiesCO2e +
+          dietCO2e +
+          foodwasteCO2e -
+          compostAvoidedCO2e;
         document.getElementById("result").innerHTML = `
             <section class="result-section">
                 Emissions from transportation: <span class="calc-value">${transportCO2e.toFixed(
                   2
                 )} kg CO₂e</span><br/>
-                Emissions avoided by composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(
+                Emissions from food waste: <span class="calc-value">${foodwasteCO2e.toFixed(
+                  2
+                )} kg CO₂e</span><br/>
+                Emissions avoided by extra composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(
                   2
                 )} kg CO₂e</span><br/>
                 Emissions from diet: <span class="calc-value">${dietCO2e.toFixed(
@@ -367,19 +409,39 @@
         `;
       }
 
-      document
-        .getElementById("timeframe")
-        .addEventListener("change", function () {
-          updateFoodFootprint();
-        });
-      document
-        .getElementById("transportType")
-        .addEventListener("change", function () {
-          updateTransportInputs();
-        });
+      //Load & manage region CO2e emissions for utilities
+      let regionData = {};
 
-      // Call on page load
-      updateTransportInputs();
+      window.addEventListener("DOMContentLoaded", () => {
+        fetch("./intensities.json")
+          .then((response) => response.json())
+          .then((data) => {
+            regionData = data.countries;
+          })
+          .catch(error => console.log("Error loading the JSON:", error))
+      });
+
+      function updateRegions() {
+        const countrySelect = document.getElementById("country");
+        const regionSelect = document.getElementById("region");
+        const selectedCountry = countrySelect.value;
+        regionSelect.innerHTML = "";
+        // Add each region to the dropdown
+        const regions = regionData[selectedCountry].regions;
+        Object.keys(regions).forEach(region => {
+            const option = document.createElement("option");
+            option.value = region;
+            option.textContent = region;
+            regionSelect.appendChild(option);
+        });
+      }
+
+      // Update the timeframe text when the page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        const selectElement = document.getElementById("utilities_timeframe");
+      updateTimeframe(selectElement);
+      
+  });
     </script>
   </body>
 </html>
