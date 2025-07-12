@@ -9,24 +9,35 @@
 </head>
 <body>
     <h1>Carbon Footprint Estimator</h1>
+
+    <!-- Transport -->
     <div class="inline-field">
-        <p>Select the time length of your lifestyle estimates:</p>
-        <select id="timeframe">
+        <h2>Transportation</h2>
+        <p>Time length: </p>
+        <select id="transport_timeframe">
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
         </select>
     </div>
-    <h2>Transportation</h2>
         <div id="transportEntriesContainer"></div>
         <div style="margin-top: 0.5em; text-align: center;">
             <button type="button" class="button" onclick="addTransportEntry()">Add mode of transport</button>
         </div>
 
-    <h2>Diet</h2>
-    <label for="diet">Select your weekly diet:</label>
+
+    <!-- Diet(s) -->
+    <div class="inline-field">
+        <h2>Diet</h2>
+        <p>Time length: </p>
+        <select id="transport_timeframe">
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+    </div>
+    <label for="diet">Select your diet:</label>
     <select id="diet" onchange="updateFoodFootprint()">
-        <option value="steak_only">Steak Only</option>
         <option value="high_meat">High Meat Eater</option>
         <option value="average">Average</option>
         <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
@@ -34,18 +45,38 @@
         <option value="vegetarian">Vegetarian</option>
         <option value="vegan">Vegan</option>
     </select>
-    <h2>Composting</h2>
+    
+    <!-- Food Waste -->
+    <div class="inline-field">
+        <h2>Food Waste</h2>
+        <p>Time length: </p>
+        <select id="foodwaste_timeframe">
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+    </div>
+
     <div class="inline-field">
         <label for="bread">Bread (kg composted):</label>
         <label for="produce">Produce (kg composted):</label>
         <label for="meat">Meat (kg composted):</label>
     </div>
+
+    <!-- Utilities -->
     <div class="inline-field">
-        <input type="number" id="bread" />
-        <input type="number" id="produce" />
-        <input type="number" id="meat" />
+        <h2>Utilities</h2>
+        <p>Time length: </p>
+        <select id="utilities_timeframe">
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+        <label for="electricity">How many KW do you use per <span class="timeframe" id="electricityTimeframe"></span>?
+            <input type="number" id="electricity" style="display:inline-block; width:auto; margin-left:0.5em;" />
+        </label>
     </div>
-    <button class="button" onclick="calculate()">Calculate Footprint</button>
+    <button class="button" onclick="calcFootprint()">Calculate Footprint</button>
     
     <div id="result"></div>
     <script>
@@ -78,7 +109,7 @@
                     <option value="walk">Walking</option>
                 </select>
             </label>
-            <label>Distance (km):
+            <label>Distance (km) the last <span class="timeframe" id="timeframe-${id}"></span>:
                 <input type="number" onchange="updateTransportDistance(${id}, this.value)">
             </label>
             <label id="fuel-eff-${id}">Fuel Efficiency (L/100km):
@@ -88,6 +119,7 @@
             <hr/>
         `;
         container.appendChild(entryDiv);
+        updateTimeframes();
     }
 
     //Keep your array in sync with the UI
@@ -97,7 +129,7 @@
 
     const fuelLabel = document.getElementById(`fuel-eff-${id}`);
     fuelLabel.style.display = mode === "car" ? "inline-block" : "none";
-}
+    }
 
     function updateTransportDistance(id, value) {
         const entry = transportEntries.find(e => e.id === id);
@@ -123,6 +155,17 @@
         } else {
             carInputs.style.display = "none";
         }
+    }
+
+    // Keep all the timeframe text in sync with the selected option
+    function updateTimeframes() {
+        const timeframe = document.getElementById("timeframe").value;
+        let text = "week";
+        if (timeframe === "monthly") text = "month";
+        else if (timeframe === "yearly") text = "year";
+        document.querySelectorAll(".timeframe").forEach(span => {
+            span.textContent = text;
+        });
     }
 
     function calculate() {
@@ -167,7 +210,6 @@
 
         //Diet
         const dietEmissionsMap = {
-            steak_only: 336,
             high_meat: 40,
             average: 25,
             pescitarian_w_s: 22,
@@ -206,9 +248,6 @@
         let emissions = 0;
         switch(diet){
             //TODO: do research about actual values
-            case "steak_only":
-                emissions = 336; //kg C02e per week
-                break;
             case "high_meat":
                 emissions = 40; //kg C02e per week
                 break;
@@ -236,17 +275,19 @@
         }
         foodOutput.textContent = (emissions * multiplier).toFixed(2);
     }
-
-    function updateKmDrivenTimeframe() {
-        const timeframe = document.getElementById("timeframe").value;
-        let text = "week";
-        if (timeframe === "monthly") text = "month";
-        else if (timeframe === "yearly") text = "year";
-        document.getElementById("kmDrivenTimeframe").textContent = text;
+    
+    /** CalcFootprint is the main fxn for calculating the footprint.
+     *  It runs when the user presses the main calc footprint button.
+     *  It calls other fxns for each sector before calling another fxn to output the data.
+     * params: none
+     * returns: none
+     **/
+    function calcFootprint() {
+        console.log("Calculating carbon footprint...");
     }
 
     document.getElementById("timeframe").addEventListener("change", function() {
-        updateKmDrivenTimeframe();
+        updateTimeframes();
         updateFoodFootprint();
     });
     document.getElementById("transportType").addEventListener("change", function() {
@@ -254,7 +295,7 @@
     });
 
     // Call on page load
-    updateKmDrivenTimeframe();
+    updateTimeframes();
     updateTransportInputs();
     </script>
 </body>
