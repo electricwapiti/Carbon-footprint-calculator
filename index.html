@@ -1,104 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.cdnfonts.com/css/atkinson-hyperlegible" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.cdnfonts.com/css/atkinson-hyperlegible"
+      rel="stylesheet"
+    />
     <title>Carbon Footprint Calculator</title>
     <link rel="stylesheet" href="./style.css" />
-</head>
-<body>
+  </head>
+  <body>
     <h1>Carbon Footprint Estimator</h1>
 
     <!-- Transport -->
     <div class="inline-field">
-        <h2>Transportation</h2>
-        <p>Time length: </p>
-        <select id="transport_timeframe" onchange="updateTimeframe(this)">
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select>
+      <h2>Transportation</h2>
+      <p>Time length:</p>
+      <select id="transport_timeframe" onchange="updateTimeframe(this)">
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
     </div>
-        <div id="transportEntriesContainer"></div>
-        <div style="margin-top: 0.5em; text-align: center;">
-            <button type="button" class="button" onclick="addTransportEntry()">Add mode of transport</button>
-        </div>
-
+    <div id="transportEntriesContainer"></div>
+    <div style="margin-top: 0.5em; text-align: center">
+      <button type="button" class="button" onclick="addTransportEntry()">
+        Add mode of transport
+      </button>
+    </div>
 
     <!-- Diet(s) -->
     <div class="inline-field">
-        <h2>Diet</h2>
-        <p>Time length: </p>
-        <select id="diet_timeframe" onchange="updateTimeframe(this)">
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select>
+      <h2>Diet</h2>
+      <p>Time length:</p>
+      <select id="diet_timeframe" onchange="updateTimeframe(this)">
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
     </div>
-    <label for="diet">Select your <span class = "timeframe" data-for="diet_timeframe">week</span>ly diet:</label>
+    <label for="diet"
+      >Select your
+      <span class="timeframe" data-for="diet_timeframe">week</span>ly
+      diet:</label
+    >
     <select id="diet" onchange="updateFoodFootprint()">
-        <option value="high_meat">High Meat Eater</option>
-        <option value="average">Average</option>
-        <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
-        <option value="pescitarian_wo_s">Pescitarian w/o shrimp</option>
-        <option value="vegetarian">Vegetarian</option>
-        <option value="vegan">Vegan</option>
+      <option value="high_meat">High Meat Eater</option>
+      <option value="average">Average</option>
+      <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
+      <option value="pescitarian_wo_s">Pescitarian w/o shrimp</option>
+      <option value="vegetarian">Vegetarian</option>
+      <option value="vegan">Vegan</option>
     </select>
-    
+
     <!-- Food Waste -->
     <div class="inline-field">
-        <h2>Food Waste</h2>
-        <p>Time length: </p>
-        <select id="foodwaste_timeframe" onchange="updateTimeframe(this)">
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select>
+      <h2>Food Waste</h2>
+      <p>Time length:</p>
+      <select id="foodwaste_timeframe" onchange="updateTimeframe(this)">
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
     </div>
 
     <div class="inline-field">
-        <label for="bread">Bread (kg composted):</label>
-        <label for="produce">Produce (kg composted):</label>
-        <label for="meat">Meat (kg composted):</label>
+      <label for="bread">Bread (kg composted):</label>
+      <label for="produce">Produce (kg composted):</label>
+      <label for="meat">Meat (kg composted):</label>
     </div>
     <div class="inline-field">
-        <input type="number" id="bread"/>
-        <input type="number" id="produce"/>
-        <input type="number" id="meat"/>
+      <input type="number" id="bread" />
+      <input type="number" id="produce" />
+      <input type="number" id="meat" />
     </div>
 
     <!-- Utilities -->
     <div class="inline-field">
-        <h2>Utilities</h2>
-        <p>Time length: </p>
-        <select id="utilities_timeframe" onchange="updateTimeframe(this)">
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select>
-        <label for="electricity">How many KW do you use per <span class="timeframe" id="electricityTimeframe"></span>?
-            <input type="number" id="electricity" style="display:inline-block; width:auto; margin-left:0.5em;" />
-        </label>
+      <h2>Utilities</h2>
+      <p>Time length:</p>
+      <select id="utilities_timeframe" onchange="updateTimeframe(this)">
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+      <label for="electricity"
+        >How many KW do you use per
+        <span class="timeframe" id="electricityTimeframe"></span>?
+        <input
+          type="number"
+          id="electricity"
+          style="display: inline-block; width: auto; margin-left: 0.5em"
+        />
+      </label>
     </div>
-    <button class="button" onclick="calcFootprint()">Calculate Footprint</button>
-    
+    <button class="button" onclick="calcFootprint()">
+      Calculate Footprint
+    </button>
+
     <div id="result"></div>
     <script>
-
-    // Transport entries management. I don't really understand it. TODO: learn what it is becasue some code might not be necessary.
-    let transportEntries = [];
-    let nextTransportId = 1;
-    function addTransportEntry() {
+      // Transport entries management. I don't really understand it. TODO: learn what it is becasue some code might not be necessary.
+      let transportEntries = [];
+      let nextTransportId = 1;
+      function addTransportEntry() {
         const container = document.getElementById("transportEntriesContainer");
         const id = nextTransportId++;
-        
+
         // Default entry object
         const entry = {
-            id,
-            mode: "car",
-            distance: 0,
-            fuelEfficiency: 0
+          id,
+          mode: "car",
+          distance: 0,
+          fuelEfficiency: 0,
         };
         transportEntries.push(entry);
 
@@ -127,71 +142,75 @@
         container.appendChild(entryDiv);
 
         //Set the correct time length text for new entries
-        const timeframeValue = document.getElementById("transport_timeframe").value;
+        const timeframeValue = document.getElementById(
+          "transport_timeframe"
+        ).value;
         let text = "week";
         if (timeframeValue === "monthly") text = "month";
         else if (timeframeValue === "yearly") text = "year";
         document.getElementById(`timeframe-${id}`).textContent = text;
-    }
+      }
 
-    //Keep your array in sync with the UI
-    function updateTransportMode(id, mode) {
-    const entry = transportEntries.find(e => e.id === id);
-    if (entry) entry.mode = mode;
+      //Keep your array in sync with the UI
+      function updateTransportMode(id, mode) {
+        const entry = transportEntries.find((e) => e.id === id);
+        if (entry) entry.mode = mode;
 
-    const fuelLabel = document.getElementById(`fuel-eff-${id}`);
-    fuelLabel.style.display = mode === "car" ? "inline-block" : "none";
-    }
+        const fuelLabel = document.getElementById(`fuel-eff-${id}`);
+        fuelLabel.style.display = mode === "car" ? "inline-block" : "none";
+      }
 
-    function updateTransportDistance(id, value) {
-        const entry = transportEntries.find(e => e.id === id);
+      function updateTransportDistance(id, value) {
+        const entry = transportEntries.find((e) => e.id === id);
         if (entry) entry.distance = parseFloat(value) || 0;
-    }
+      }
 
-    function updateTransportFuel(id, value) {
-        const entry = transportEntries.find(e => e.id === id);
+      function updateTransportFuel(id, value) {
+        const entry = transportEntries.find((e) => e.id === id);
         if (entry) entry.fuelEfficiency = parseFloat(value) || 0;
-    }
+      }
 
-    function removeTransportEntry(id) {
-        transportEntries = transportEntries.filter(e => e.id !== id);
+      function removeTransportEntry(id) {
+        transportEntries = transportEntries.filter((e) => e.id !== id);
         const entryDiv = document.getElementById(`transport-${id}`);
         if (entryDiv) entryDiv.remove();
-    }
+      }
 
-    function updateTransportInputs() {
+      function updateTransportInputs() {
         const transportType = document.getElementById("transportType").value;
         const carInputs = document.getElementById("carInputs");
         if (transportType === "car") {
-            carInputs.style.display = "block";
+          carInputs.style.display = "block";
         } else {
-            carInputs.style.display = "none";
+          carInputs.style.display = "none";
         }
-    }
+      }
 
-    // Keep all the timeframe text in sync with the selected option
-    function updateTimeframe(selectElement) {
+      // Keep all the timeframe text in sync with the selected option
+      function updateTimeframe(selectElement) {
         const value = selectElement.value;
         let text = "week";
-        if(value === "monthly") text = "month";
+        if (value === "monthly") text = "month";
         else if (value === "yearly") text = "year";
-        const relatedSpan = document.querySelectorAll(`.timeframe[data-for="${selectElement.id}"]`).forEach(span => {
+        const relatedSpan = document
+          .querySelectorAll(`.timeframe[data-for="${selectElement.id}"]`)
+          .forEach((span) => {
             span.textContent = text;
-        });
-    }
-    
-    //TODO: Make an array of diets and portion sizes (small, med, large). Use this to sum up the emissions of an entire household.
-    function calcDiet() {
+          });
+      }
+
+      //TODO: Make an array of diets and portion sizes (small, med, large). Use this to sum up the emissions of an entire household.
+      function calcDiet() {
         const dietValue = document.getElementById("diet").value;
         const timeframe = document.getElementById("diet_timeframe").value;
 
         const dietEmissionsMap = {
-            high_meat: 40,
-            average: 25,
-            pescitarian_w_s: 22,
-            pescitarian_wo_s: 18,
-            vegetarian: 15,
-            vegan: 12
+          high_meat: 40,
+          average: 25,
+          pescitarian_w_s: 22,
+          pescitarian_wo_s: 18,
+          vegetarian: 15,
+          vegan: 12,
         };
 
         let dietCO2e = dietEmissionsMap[dietValue] || 0;
@@ -199,40 +218,41 @@
         console.log("the diet multiplier found is " + multiplier);
         dietCO2e *= multiplier;
         return dietCO2e;
-    }
-    
-    function calcTransit() {
+      }
+
+      function calcTransit() {
         const timeframe = document.getElementById("transport_timeframe").value;
 
         // Emissions factors in kg CO2e per km
         const emissionsPerKm = {
-            bus: 0.105,   // average bus
-            train: 0.041, // average train
-            bike: 0,      // bike
-            walk: 0       // walk
+          bus: 0.105, // average bus
+          train: 0.041, // average train
+          bike: 0, // bike
+          walk: 0, // walk
         };
 
         let transportCO2e = 0;
 
         for (const entry of transportEntries) {
-            const km = entry.distance || 0;
-            if (entry.mode === "car") {
-                const litersUsed = (km / 100) * (entry.fuelEfficiency || 0);
-                transportCO2e += litersUsed * 2.31;
-            } else {
-                transportCO2e += (emissionsPerKm[entry.mode] || 0) * km;
-            }
+          const km = entry.distance || 0;
+          if (entry.mode === "car") {
+            const litersUsed = (km / 100) * (entry.fuelEfficiency || 0);
+            transportCO2e += litersUsed * 2.31;
+          } else {
+            transportCO2e += (emissionsPerKm[entry.mode] || 0) * km;
+          }
         }
         return transportCO2e;
-    }
+      }
 
-    //TODO: Split off the "composting benefit" part and make this be a food waste CO2e generator. 
-    //Composting is less bad for the environment than landfill, not good.
-    //Only stuff from outside the household which wouldn't have been composted otherwise is 'good' for the environment.
-    function calcFoodWaste() {
+      //TODO: Split off the "composting benefit" part and make this be a food waste CO2e generator.
+      //Composting is less bad for the environment than landfill, not good.
+      //Only stuff from outside the household which wouldn't have been composted otherwise is 'good' for the environment.
+      function calcFoodWaste() {
         //Start with composting that wouldn't have been done without you.
         const bread = parseFloat(document.getElementById("bread").value) || 0;
-        const produce = parseFloat(document.getElementById("produce").value) || 0;
+        const produce =
+          parseFloat(document.getElementById("produce").value) || 0;
         const meat = parseFloat(document.getElementById("meat").value) || 0;
 
         // Composting benefit: 100 yr CO2e of methane avoided
@@ -242,93 +262,109 @@
         const ESCAPE_FACTOR = 0.61; // 61% escapes
         const GWP_100yr = 28;
 
-        const compostCH4 = (bread * CH4_BREAD + produce * CH4_PRODUCE 
-            + meat * CH4_MEAT) * ESCAPE_FACTOR;
+        const compostCH4 =
+          (bread * CH4_BREAD + produce * CH4_PRODUCE + meat * CH4_MEAT) *
+          ESCAPE_FACTOR;
 
         let compostAvoidedCO2e = compostCH4 * GWP_100yr;
 
         //Find the selected timeframe and multiply it by that.
-        const foodwasteTimeframe = document.getElementById("foodwaste_timeframe").value; 
+        const foodwasteTimeframe = document.getElementById(
+          "foodwaste_timeframe"
+        ).value;
         const multiplier = multiply(foodwasteTimeframe);
         console.log("the food waste multiplier found is " + multiplier);
         compostAvoidedCO2e *= multiplier;
         return compostAvoidedCO2e;
-    }
+      }
 
-    function multiply(timeframeElement) {
+      function multiply(timeframeElement) {
         let multiplier = 1;
-        if (timeframeElement === "monthly"){
-            multiplier = 4.345;
+        if (timeframeElement === "monthly") {
+          multiplier = 4.345;
         } else if (timeframeElement === "yearly") {
-            multiplier = 52;
+          multiplier = 52;
         }
         return multiplier;
-    }
+      }
 
-    function updateFoodFootprint() {
+      function updateFoodFootprint() {
         const diet = document.getElementById("diet").value;
         const foodOutput = document.getElementById("foodOutput");
         const timeframe = document.getElementById("diet_timeframe").value;
         let emissions = 0;
-        switch(diet) {
-            //TODO: do research about actual values
-            case "high_meat":
-                emissions = 40; //kg C02e per week
-                break;
-            case "average":
-                emissions = 25; //kg C02e per week
-                break;
-            case "pescitarian_w_shrimp":
-                emissions = 22; //kg C02e per week
-                break;
-            case "pescitarian_wo_shrimp":
-                emissions = 18; //kg C02e per week
-                break;
-            case "vegetarian":
-                emissions = 15; //kg C02e per week
-                break;
-            case "vegan":
-                emissions = 12; //kg C02e per week
-                break;
+        switch (diet) {
+          //TODO: do research about actual values
+          case "high_meat":
+            emissions = 40; //kg C02e per week
+            break;
+          case "average":
+            emissions = 25; //kg C02e per week
+            break;
+          case "pescitarian_w_shrimp":
+            emissions = 22; //kg C02e per week
+            break;
+          case "pescitarian_wo_shrimp":
+            emissions = 18; //kg C02e per week
+            break;
+          case "vegetarian":
+            emissions = 15; //kg C02e per week
+            break;
+          case "vegan":
+            emissions = 12; //kg C02e per week
+            break;
         }
         multiplier = multiply(diet_timeframe.value);
         foodOutput.textContent = (emissions * multiplier).toFixed(2);
-    }
-    
-    /** CalcFootprint is the main fxn for calculating the footprint.
-     *  It runs when the user presses the main calc footprint button.
-     *  It calls other fxns for each sector before calling another fxn to output the data.
-     * params: none
-     * returns: none
-     **/
-    function calcFootprint() {
+      }
+
+      /** CalcFootprint is the main fxn for calculating the footprint.
+       *  It runs when the user presses the main calc footprint button.
+       *  It calls other fxns for each sector before calling another fxn to output the data.
+       * params: none
+       * returns: none
+       **/
+      function calcFootprint() {
         console.log("✅ Calculate Footprint button was pressed");
         console.log("Calculating carbon footprint...");
         transportCO2e = calcTransit();
         dietCO2e = calcDiet();
         const foodwasteCO2e = calcFoodWaste();
 
-        const totalEmissions = transportCO2e + dietCO2e + foodwasteCO2e - compostAvoidedCO2e;
+        const totalEmissions =
+          transportCO2e + dietCO2e + foodwasteCO2e - compostAvoidedCO2e;
         document.getElementById("result").innerHTML = `
             <section class="result-section">
-                Emissions from transportation: <span class="calc-value">${transportCO2e.toFixed(2)} kg CO₂e</span><br/>
-                Emissions avoided by composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(2)} kg CO₂e</span><br/>
-                Emissions from diet: <span class="calc-value">${dietCO2e.toFixed(2)} kg CO₂e</span><br/>
+                Emissions from transportation: <span class="calc-value">${transportCO2e.toFixed(
+                  2
+                )} kg CO₂e</span><br/>
+                Emissions avoided by composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(
+                  2
+                )} kg CO₂e</span><br/>
+                Emissions from diet: <span class="calc-value">${dietCO2e.toFixed(
+                  2
+                )} kg CO₂e</span><br/>
                 <hr>
-                <strong>Total carbon footprint: <span class="calc-value">${totalEmissions.toFixed(2)} kg CO₂e</span></strong>
+                <strong>Total carbon footprint: <span class="calc-value">${totalEmissions.toFixed(
+                  2
+                )} kg CO₂e</span></strong>
             </section>
         `;
-    }
+      }
 
-    document.getElementById("timeframe").addEventListener("change", function() {
-        updateFoodFootprint();
-    });
-    document.getElementById("transportType").addEventListener("change", function() {
-        updateTransportInputs();
-    });
+      document
+        .getElementById("timeframe")
+        .addEventListener("change", function () {
+          updateFoodFootprint();
+        });
+      document
+        .getElementById("transportType")
+        .addEventListener("change", function () {
+          updateTransportInputs();
+        });
 
-    // Call on page load
-    updateTransportInputs();
+      // Call on page load
+      updateTransportInputs();
     </script>
-</body>
+  </body>
 </html>
