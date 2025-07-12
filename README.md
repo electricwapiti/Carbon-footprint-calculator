@@ -1,6 +1,6 @@
 # Carbon-footprint-calculator
 # Current Progress
-This is a bare HTML carbon footprint calculator.
+This is a basic HTML/CSS/JS carbon footprint calculator.
 In the carbon footprint calculator, you can input your lifestyle for a typical week, month or year. Then, the calculator outputs your yearly carbon footprint.
 Check it out with this link: https://electricwapiti.github.io/Carbon-footprint-calculator/
 
