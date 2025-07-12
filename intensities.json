@@ -1,0 +1,180 @@
+{
+  "countries": {
+    "USA": {
+      "name": "United States of America",
+      "regions": {
+        "Alabama": {
+          "gCO2e_kWh": 352
+        },
+        "Alaska": {
+          "gCO2e_kWh": 415
+        },
+        "Arizona": {
+          "gCO2e_kWh": 311
+        },
+        "Arkansas": {
+          "gCO2e_kWh": 412
+        },
+        "California": {
+          "gCO2e_kWh": 258
+        },
+        "Colorado": {
+          "gCO2e_kWh": 388
+        },
+        "Connecticut": {
+          "gCO2e_kWh": 297
+        },
+        "Delaware": {
+          "gCO2e_kWh": 448
+        },
+        "Florida": {
+          "gCO2e_kWh": 413
+        },
+        "Georgia": {
+          "gCO2e_kWh": 333
+        },
+        "Hawaii": {
+          "gCO2e_kWh": 516
+        },
+        "Idaho": {
+          "gCO2e_kWh": 258
+        },
+        "Illinois": {
+          "gCO2e_kWh": 213
+        },
+        "Indiana": {
+          "gCO2e_kWh": 553
+        },
+        "Iowa": {
+          "gCO2e_kWh": 243
+        },
+        "Kansas": {
+          "gCO2e_kWh": 239
+        },
+        "Kentucky": {
+          "gCO2e_kWh": 644
+        },
+        "Louisiana": {
+          "gCO2e_kWh": 420
+        },
+        "Maine": {
+          "gCO2e_kWh": 200
+        },
+        "Maryland": {
+          "gCO2e_kWh": 333
+        },
+        "Massachusetts": {
+          "gCO2e_kWh": 416
+        },
+        "Michigan": {
+          "gCO2e_kWh": 410
+        },
+        "Minnesota": {
+          "gCO2e_kWh": 323
+        },
+        "Mississippi": {
+          "gCO2e_kWh": 420
+        },
+        "Missouri": {
+          "gCO2e_kWh": 526
+        },
+        "Montana": {
+          "gCO2e_kWh": 347
+        },
+        "Nebraska": {
+          "gCO2e_kWh": 380
+        },
+        "Nevada": {
+          "gCO2e_kWh": 328
+        },
+        "New Hampshire": {
+          "gCO2e_kWh": 159
+        },
+        "New Jersey": {
+          "gCO2e_kWh": 293
+        },
+        "New Mexico": {
+          "gCO2e_kWh": 326
+        },
+        "New York": {
+          "gCO2e_kWh": 256
+        },
+        "North Carolina": {
+          "gCO2e_kWh": 324
+        },
+        "North Dakota": {
+          "gCO2e_kWh": 478
+        },
+        "Ohio": {
+          "gCO2e_kWh": 470
+        },
+        "Oklahoma": {
+          "gCO2e_kWh": 307
+        },
+        "Oregon": {
+          "gCO2e_kWh": 205
+        },
+        "Pennsylvania": {
+          "gCO2e_kWh": 344
+        },
+        "Rhode Island": {
+          "gCO2e_kWh": 445
+        },
+        "South Carolina": {
+          "gCO2e_kWh": 261
+        },
+        "South Dakota": {
+          "gCO2e_kWh": 128
+        },
+        "Tennessee": {
+          "gCO2e_kWh": 343
+        },
+        "Texas": {
+          "gCO2e_kWh": 358
+        },
+        "Utah": {
+          "gCO2e_kWh": 546
+        },
+        "Vermont": {
+          "gCO2e_kWh": 261
+        },
+        "Virginia": {
+          "gCO2e_kWh": 351
+        },
+        "Washington": {
+          "gCO2e_kWh": 131
+        },
+        "West Virginia": {
+          "gCO2e_kWh": 735
+        },
+        "Wisconsin": {
+          "gCO2e_kWh": 464
+        },
+        "Wyoming": {
+          "gCO2e_kWh": 564
+        }
+      }
+    },
+    "CAN": {
+      "name": "Canada",
+      "regions": {
+
+      }
+    },
+    "MEX": {
+      "name": "Mexico",
+      "regions": {
+      }
+    },
+    "TAI": {
+      "name": "Taiwan",
+      "regions": {
+      }
+    },
+    "NET": {
+      "name": "Netherlands",
+      "regions": {
+      }
+    }
+  }
+}
