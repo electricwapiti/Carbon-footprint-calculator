@@ -14,7 +14,7 @@
     <div class="inline-field">
         <h2>Transportation</h2>
         <p>Time length: </p>
-        <select id="transport_timeframe">
+        <select id="transport_timeframe" onchange="updateTimeframe(this)">
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
@@ -30,13 +30,13 @@
     <div class="inline-field">
         <h2>Diet</h2>
         <p>Time length: </p>
-        <select id="transport_timeframe">
+        <select id="diet_timeframe" onchange="updateTimeframe(this)">
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
         </select>
     </div>
-    <label for="diet">Select your diet:</label>
+    <label for="diet">Select your <span class = "timeframe" data-for="diet_timeframe">week</span>ly diet:</label>
     <select id="diet" onchange="updateFoodFootprint()">
         <option value="high_meat">High Meat Eater</option>
         <option value="average">Average</option>
@@ -50,7 +50,7 @@
     <div class="inline-field">
         <h2>Food Waste</h2>
         <p>Time length: </p>
-        <select id="foodwaste_timeframe">
+        <select id="foodwaste_timeframe" onchange="updateTimeframe(this)">
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
@@ -62,12 +62,17 @@
         <label for="produce">Produce (kg composted):</label>
         <label for="meat">Meat (kg composted):</label>
     </div>
+    <div class="inline-field">
+        <input type="number" id="bread"/>
+        <input type="number" id="produce"/>
+        <input type="number" id="meat"/>
+    </div>
 
     <!-- Utilities -->
     <div class="inline-field">
         <h2>Utilities</h2>
         <p>Time length: </p>
-        <select id="utilities_timeframe">
+        <select id="utilities_timeframe" onchange="updateTimeframe(this)">
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
@@ -80,7 +85,8 @@
     
     <div id="result"></div>
     <script>
-    // Transport entries management
+
+    // Transport entries management. I don't really understand it. TODO: learn what it is becasue some code might not be necessary.
     let transportEntries = [];
     let nextTransportId = 1;
     function addTransportEntry() {
@@ -109,7 +115,7 @@
                     <option value="walk">Walking</option>
                 </select>
             </label>
-            <label>Distance (km) the last <span class="timeframe" id="timeframe-${id}"></span>:
+            <label>Distance (km) the last <span class="timeframe" id="timeframe-${id}" data-for="transport_timeframe"></span>:
                 <input type="number" onchange="updateTransportDistance(${id}, this.value)">
             </label>
             <label id="fuel-eff-${id}">Fuel Efficiency (L/100km):
@@ -119,7 +125,13 @@
             <hr/>
         `;
         container.appendChild(entryDiv);
-        updateTimeframes();
+
+        //Set the correct time length text for new entries
+        const timeframeValue = document.getElementById("transport_timeframe").value;
+        let text = "week";
+        if (timeframeValue === "monthly") text = "month";
+        else if (timeframeValue === "yearly") text = "year";
+        document.getElementById(`timeframe-${id}`).textContent = text;
     }
 
     //Keep your array in sync with the UI
@@ -158,45 +170,72 @@
     }
 
     // Keep all the timeframe text in sync with the selected option
-    function updateTimeframes() {
-        const timeframe = document.getElementById("timeframe").value;
+    function updateTimeframe(selectElement) {
+        const value = selectElement.value;
         let text = "week";
-        if (timeframe === "monthly") text = "month";
-        else if (timeframe === "yearly") text = "year";
-        document.querySelectorAll(".timeframe").forEach(span => {
+        if(value === "monthly") text = "month";
+        else if (value === "yearly") text = "year";
+        const relatedSpan = document.querySelectorAll(`.timeframe[data-for="${selectElement.id}"]`).forEach(span => {
             span.textContent = text;
         });
     }
-
-    function calculate() {
-        const bread = parseFloat(document.getElementById("bread").value) || 0;
-        const produce = parseFloat(document.getElementById("produce").value) || 0;
-        const meat = parseFloat(document.getElementById("meat").value) || 0;
+    
+    //TODO: Make an array of diets and portion sizes (small, med, large). Use this to sum up the emissions of an entire household.
+    function calcDiet() {
         const dietValue = document.getElementById("diet").value;
-        const timeframe = document.getElementById("timeframe").value;
+        const timeframe = document.getElementById("diet_timeframe").value;
 
-        // Emissions factors in kg CO2e per km (approximate values)
+        const dietEmissionsMap = {
+            high_meat: 40,
+            average: 25,
+            pescitarian_w_s: 22,
+            pescitarian_wo_s: 18,
+            vegetarian: 15,
+            vegan: 12
+        };
+
+        let dietCO2e = dietEmissionsMap[dietValue] || 0;
+        const multiplier = multiply(diet_timeframe);
+        console.log("the diet multiplier found is " + multiplier);
+        dietCO2e *= multiplier;
+        return dietCO2e;
+    }
+    
+    function calcTransit() {
+        const timeframe = document.getElementById("transport_timeframe").value;
+
+        // Emissions factors in kg CO2e per km
         const emissionsPerKm = {
             bus: 0.105,   // average bus
             train: 0.041, // average train
             bike: 0,      // bike
             walk: 0       // walk
         };
-        
-        let transportEmissions = 0;
+
+        let transportCO2e = 0;
 
         for (const entry of transportEntries) {
             const km = entry.distance || 0;
-
             if (entry.mode === "car") {
                 const litersUsed = (km / 100) * (entry.fuelEfficiency || 0);
-                transportEmissions += litersUsed * 2.31;
+                transportCO2e += litersUsed * 2.31;
             } else {
-                transportEmissions += (emissionsPerKm[entry.mode] || 0) * km;
+                transportCO2e += (emissionsPerKm[entry.mode] || 0) * km;
             }
         }
+        return transportCO2e;
+    }
 
-        // Composting benefit: methane avoided (CH4), converted to CO2e over 100 years
+    //TODO: Split off the "composting benefit" part and make this be a food waste CO2e generator. 
+    //Composting is less bad for the environment than landfill, not good.
+    //Only stuff from outside the household which wouldn't have been composted otherwise is 'good' for the environment.
+    function calcFoodWaste() {
+        //Start with composting that wouldn't have been done without you.
+        const bread = parseFloat(document.getElementById("bread").value) || 0;
+        const produce = parseFloat(document.getElementById("produce").value) || 0;
+        const meat = parseFloat(document.getElementById("meat").value) || 0;
+
+        // Composting benefit: 100 yr CO2e of methane avoided
         const CH4_BREAD = 0.375;
         const CH4_PRODUCE = 0.25;
         const CH4_MEAT = 0.7;
@@ -208,45 +247,30 @@
 
         let compostAvoidedCO2e = compostCH4 * GWP_100yr;
 
-        //Diet
-        const dietEmissionsMap = {
-            high_meat: 40,
-            average: 25,
-            pescitarian_w_s: 22,
-            pescitarian_wo_s: 18,
-            vegetarian: 15,
-            vegan: 12
-        };
-        let dietCO2e = dietEmissionsMap[dietValue] || 0;
+        //Find the selected timeframe and multiply it by that.
+        const foodwasteTimeframe = document.getElementById("foodwaste_timeframe").value; 
+        const multiplier = multiply(foodwasteTimeframe);
+        console.log("the food waste multiplier found is " + multiplier);
+        compostAvoidedCO2e *= multiplier;
+        return compostAvoidedCO2e;
+    }
 
-        // Apply timeframe multiplier
+    function multiply(timeframeElement) {
         let multiplier = 1;
-        if (timeframe === "monthly") {
+        if (timeframeElement === "monthly"){
             multiplier = 4.345;
-        } else if (timeframe === "yearly") {
+        } else if (timeframeElement === "yearly") {
             multiplier = 52;
         }
-        compostAvoidedCO2e *= multiplier;
-        dietCO2e *= multiplier;
+        return multiplier;
+    }
 
-        // Sum total emissions (subtract composting benefit)
-        const totalEmissions = transportEmissions + dietCO2e - compostAvoidedCO2e;
-        document.getElementById("result").innerHTML = `
-            <section class="result-section">
-                Emissions from transportation: <span class="calc-value">${transportEmissions.toFixed(2)} kg CO₂e</span><br/>
-                Emissions avoided by composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(2)} kg CO₂e</span><br/>
-                Emissions from diet: <span class="calc-value">${dietCO2e.toFixed(2)} kg CO₂e</span><br/>
-                <hr>
-                <strong>Total carbon footprint: <span class="calc-value">${totalEmissions.toFixed(2)} kg CO₂e</span></strong>
-            </section>
-        `;
-    }  
     function updateFoodFootprint() {
         const diet = document.getElementById("diet").value;
         const foodOutput = document.getElementById("foodOutput");
-        const timeframe = document.getElementById("timeframe").value;
+        const timeframe = document.getElementById("diet_timeframe").value;
         let emissions = 0;
-        switch(diet){
+        switch(diet) {
             //TODO: do research about actual values
             case "high_meat":
                 emissions = 40; //kg C02e per week
@@ -267,12 +291,7 @@
                 emissions = 12; //kg C02e per week
                 break;
         }
-        let multiplier = 1;
-        if (timeframe === "monthly") {
-            multiplier = 4.345; // average weeks per month
-        } else if (timeframe === "yearly") {
-            multiplier = 52;
-        }
+        multiplier = multiply(diet_timeframe.value);
         foodOutput.textContent = (emissions * multiplier).toFixed(2);
     }
     
@@ -283,11 +302,25 @@
      * returns: none
      **/
     function calcFootprint() {
+        console.log("✅ Calculate Footprint button was pressed");
         console.log("Calculating carbon footprint...");
+        transportCO2e = calcTransit();
+        dietCO2e = calcDiet();
+        const foodwasteCO2e = calcFoodWaste();
+
+        const totalEmissions = transportCO2e + dietCO2e + foodwasteCO2e - compostAvoidedCO2e;
+        document.getElementById("result").innerHTML = `
+            <section class="result-section">
+                Emissions from transportation: <span class="calc-value">${transportCO2e.toFixed(2)} kg CO₂e</span><br/>
+                Emissions avoided by composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(2)} kg CO₂e</span><br/>
+                Emissions from diet: <span class="calc-value">${dietCO2e.toFixed(2)} kg CO₂e</span><br/>
+                <hr>
+                <strong>Total carbon footprint: <span class="calc-value">${totalEmissions.toFixed(2)} kg CO₂e</span></strong>
+            </section>
+        `;
     }
 
     document.getElementById("timeframe").addEventListener("change", function() {
-        updateTimeframes();
         updateFoodFootprint();
     });
     document.getElementById("transportType").addEventListener("change", function() {
@@ -295,7 +328,6 @@
     });
 
     // Call on page load
-    updateTimeframes();
     updateTransportInputs();
     </script>
 </body>
