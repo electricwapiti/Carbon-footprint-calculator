@@ -33,17 +33,9 @@
     <!-- Diet(s) -->
     <div class="inline-field">
       <h2>Diet</h2>
-      <p>Time length:</p>
-      <select id="diet_timeframe" onchange="updateTimeframe(this)">
-        <option value="weekly">Weekly</option>
-        <option value="monthly">Monthly</option>
-        <option value="yearly">Yearly</option>
-      </select>
     </div>
     <label for="diet"
-      >Select your
-      <span class="timeframe" data-for="diet_timeframe">week</span>ly
-      diet:</label
+      >Select your diet:</label
     >
     <select id="diet" onchange="updateFoodFootprint()">
       <option value="high_meat">High Meat Eater</option>
@@ -64,7 +56,29 @@
         <option value="yearly">Yearly</option>
       </select>
     </div>
-
+    <p>How much food waste do you throw away from your household?</p>
+    <div class="inline-field">
+      <label for="bread">Bread (kg thrown away):</label>
+      <label for="produce">Produce (kg thrown away):</label>
+      <label for="meat">Meat (kg thrown away):</label>
+    </div>
+    <div class="inline-field">
+      <input type="number" id="trash-bread" />
+      <input type="number" id="trash-produce" />
+      <input type="number" id="trash-meat" />
+    </div>
+    <p>How much food waste do you compost from your household?</p>
+    <div class="inline-field">
+      <label for="bread">Bread (kg composted):</label>
+      <label for="produce">Produce (kg composted):</label>
+      <label for="meat">Meat (kg composted):</label>
+    </div>
+    <div class="inline-field">
+      <input type="number" id="bread" />
+      <input type="number" id="produce" />
+      <input type="number" id="meat" />
+    </div>
+    <p>How much food waste do you compost from outside your household?</p>
     <div class="inline-field">
       <label for="bread">Bread (kg composted):</label>
       <label for="produce">Produce (kg composted):</label>
@@ -101,7 +115,7 @@
 
     <div id="result"></div>
     <script>
-      // Transport entries management. I don't really understand it. TODO: learn what it is becasue some code might not be necessary.
+      // Transport entries management. I don't really understand it. TODO: learn what it is becasuse some code might not be necessary.
       let transportEntries = [];
       let nextTransportId = 1;
       function addTransportEntry() {
@@ -202,7 +216,6 @@
       //TODO: Make an array of diets and portion sizes (small, med, large). Use this to sum up the emissions of an entire household.
       function calcDiet() {
         const dietValue = document.getElementById("diet").value;
-        const timeframe = document.getElementById("diet_timeframe").value;
 
         const dietEmissionsMap = {
           high_meat: 40,
@@ -214,7 +227,6 @@
         };
 
         let dietCO2e = dietEmissionsMap[dietValue] || 0;
-        dietCO2e = convertToYearly(diet_timeframe, dietCO2e);
         return dietCO2e;
       }
 
@@ -241,7 +253,7 @@
           }
         }
 
-        transportCO2e = convertToYearly(transport_timeframe, transportCO2e);
+        transportCO2e = convertToYearly(timeframe, transportCO2e);
         return transportCO2e;
       }
 
@@ -296,8 +308,6 @@
 
       function updateFoodFootprint() {
         const diet = document.getElementById("diet").value;
-        const foodOutput = document.getElementById("foodOutput");
-        const timeframe = document.getElementById("diet_timeframe").value;
         let emissions = 0;
         switch (diet) {
           //TODO: do research about actual values
@@ -320,8 +330,6 @@
             emissions = 12; //kg C02e per week
             break;
         }
-        multiplier = convertToYearly(timeframe);
-        //foodOutput.textContent = (emissions * multiplier).toFixed(2);
       }
 
       /** CalcFootprint is the main fxn for calculating the footprint.
