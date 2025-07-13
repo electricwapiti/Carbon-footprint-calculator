@@ -99,7 +99,7 @@
       </select>
     </div>
     <label for="electricity"
-      >How many KW do you use per
+      >How many kW do you use per
       <span class="timeframe" data-for="utilities_timeframe"></span>?
       <input
         type="number"
@@ -122,6 +122,14 @@
       <input
         type="number"
         id="water"
+        style="display: inline-block; width: auto; margin-left: 0.5em"
+      />
+    <label for="water"
+      >Can you plz search on the internet for "kWh for 1 m^3 of water near me"? It's very local.
+      <span class="timeframe" data-for="utilities_timeframe"></span>?
+      <input
+        type="number"
+        id="waterEI"
         style="display: inline-block; width: auto; margin-left: 0.5em"
       />
     </label>
@@ -296,7 +304,7 @@
       }
 
       // Calculate the CO2e emissions avoided by composting food waste from outside the household.
-      // This is a societal emission reduction opportunity. TODO: add more opportunities (e.g. activism, lobbying, etc.) if you think of any.
+      // This is a societal emission reduction opportunity. TODO: add more opportunities (e.g. activism, lobbying, voting, donating, etc.) if you think of any.
       function calcCompostAvoided() {
         const bread = parseFloat(document.getElementById("bread").value) || 0;
         const produce =
@@ -326,6 +334,46 @@
         return compostAvoidedCO2e;
       }
 
+      function calcUtilities() {
+        //get the values from the inputs
+        //get the location selected for sources
+        //read the specific region's CO2e intensity for each utility type from the JSON file
+        //convert the input into kg CO2e
+        //add & return the total emissions
+        
+        //get the values from the inputs
+        const timeframe = document.getElementById("utilities_timeframe").value;
+        const kWh = parseFloat(document.getElementById("electricity").value) || 0;
+        const m3Gas = parseFloat(document.getElementById("gas").value) || 0;
+        const litersWater = parseFloat(document.getElementById("water").value) || 0;
+        //Convert inputs to yearly emissions
+        const yearlykWh = convertToYearly(timeframe, kWh);
+        const yearlyGas = convertToYearly(timeframe, m3Gas);
+        const yearlyWater = convertToYearly(timeframe, litersWater);
+        //Get region's electricity, gas, and water CO2e intensities
+        const regionInfo = regionData[country]?.regions?.[region];
+        const electricityIntensity = regionInfo.gCO2e_kWh * 0.001;
+        const electricityCO2e = yearlykWh * electricityIntensity;
+        //TODO:Find gas and water intensities, put em in the JSON file 
+
+        //Calculate water emissions: 
+        // CO2e intensity for H2O = H2O energy intensity * electricity carbon intensity + 30 g/m^3 (additives)
+        const yearlyM3Water = yearlyWater * 0.001;
+        //I had to ask for user input as its highly local :( 
+        // TODO: compile a list of water EI values for different regions
+        const waterEI = parseFloat(document.getElementById("waterEI").value) || 0; 
+        const waterCO2e = yearlyM3Water * (WaterEI * electricityIntensity + 0.03);
+
+
+        //const gasIntensity = regionData[country].regions[region].gas;
+        //const waterIntensity = regionData[country].regions[region].water;
+        //For now, use placeholder values of "0.5" for gas and "0.1" for water
+        const gasIntensity = 0.5; // kg CO2e per m3
+        const waterIntensity = 0.1; // kg CO2e per liter
+        const gasCO2e = yearlyGas * gasIntensity; //TODO: THIS IS A PLACEHOLDER VALUE, DO NOT USE IT IN PRODUCTION
+        const totalUtilityCO2e = electricityCO2e + waterCO2e + gasCO2e;
+        return totalUtilityCO2e;
+      }
       /**
        * Convert the input value to yearly emissions based on the selected timeframe.
        * @param {string} timeframeElement - The selected timeframe (weekly, monthly, yearly).
@@ -375,9 +423,25 @@
        * returns: none
        **/
       function calcFootprint() {
+        //Verify that the user set enough data to calculate a footprint
+        if (
+          transportEntries.length === 0 ||
+          document.getElementById("diet").value === "" ||
+          document.getElementById("utilities_timeframe").value === "" ||
+          document.getElementById("country").value === "" ||
+          document.getElementById("region").value === ""
+        ) {
+          alert("Please fill in all required fields.");
+          return;
+        }
+
         transportCO2e = calcTransit();
         dietCO2e = calcDiet();
-        utilitiesCO2e = 0; // TODO: Implement utilities calculation
+        // Water CO2e/L
+        // Electricity CO2e/kWh
+        // Gas CO2e/m3
+        
+        utilitiesCO2e = calcUtilities();
         foodwasteCO2e = calcFoodWaste();
         compostAvoidedCO2e = calcCompostAvoided();
 
@@ -390,6 +454,9 @@
         document.getElementById("result").innerHTML = `
             <section class="result-section">
                 Emissions from transportation: <span class="calc-value">${transportCO2e.toFixed(
+                  2
+                )} kg CO₂e</span><br/>
+                Emissions from utilities: <span class="calc-value">${utilitiesCO2e.toFixed(
                   2
                 )} kg CO₂e</span><br/>
                 Emissions from food waste: <span class="calc-value">${foodwasteCO2e.toFixed(
@@ -408,7 +475,9 @@
             </section>
         `;
       }
-
+      function getRegionData() {
+        // 
+      }
       //Load & manage region CO2e emissions for utilities
       let regionData = {};
 
