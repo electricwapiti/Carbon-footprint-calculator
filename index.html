@@ -176,23 +176,29 @@
         entryDiv.className = "transport-entry";
         entryDiv.id = `transport-${id}`;
         entryDiv.innerHTML = `
-            <label>Mode:
-                <select onchange="updateTransportMode(${id}, this.value)">
-                    <option value="car">Car</option>
-                    <option value="bus">Bus</option>
-                    <option value="train">Train</option>
-                    <option value="bike">Bicycle</option>
-                    <option value="walk">Walking</option>
-                </select>
-            </label>
-            <label>Distance (km) the last <span class="timeframe" id="timeframe-${id}" data-for="transport_timeframe"></span>:
-                <input type="number" onchange="updateTransportDistance(${id}, this.value)">
-            </label>
-            <label id="fuel-eff-${id}">Fuel Efficiency (L/100km):
-                <input type="number" onchange="updateTransportFuel(${id}, this.value)">
-            </label>
-            <button type="button" class="button" onclick="removeTransportEntry(${id})">Remove</button>
-            <hr/>
+            <div class="transport-row">
+              <label>
+                  <select onchange="updateTransportMode(${id}, this.value)">
+                      <option value="car">Car</option>
+                      <option value="bus">Bus</option>
+                      <option value="train">Train</option>
+                      <option value="bike">Bicycle</option>
+                      <option value="walk">Walking</option>
+                  </select>
+              </label>
+
+              <label>
+                  km last
+                  <span class="timeframe" id="timeframe-${id}" data-for="transport_timeframe"></span>:
+                  <input type="number" onchange="updateTransportDistance(${id}, this.value)">
+              </label>
+
+              <label id="fuel-eff-${id}">Fuel Efficiency (L/100km):
+                  <input type="number" onchange="updateTransportFuel(${id}, this.value)">
+              </label>
+
+              <button type="button" class="button delete-button" onclick="removeTransportEntry(${id})">X</button>
+            </div>
         `;
         container.appendChild(entryDiv);
 

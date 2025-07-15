@@ -70,6 +70,13 @@ body {
     background-color: #1b512dff; /* cal poly green */
 }
 
+.delete-button {
+    background-color: #e74c3c; /* red for delete */
+}
+.delete-button:hover {
+    background-color: #c0392b; /* darker red on hover */
+}
+
 .inline-field {
     display: flex;
     align-items: center;
@@ -87,6 +94,19 @@ body {
     border-radius: 8px;
     padding: 1em 1.5em;
     box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.transport-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap; /* allows wrapping on smaller screens */
+    background-color: #b1cf5fff; /* yellow-green */
+    
+    padding: 1 rem 2 rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin: 1rem 0;
 }
 
 /* Ensure all children inside .result-section have transparent background */
