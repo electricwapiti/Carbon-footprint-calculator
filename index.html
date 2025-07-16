@@ -165,7 +165,25 @@
     <p>Source code: <a href="https://github.com/electricwapiti/Carbon-footprint-calculator">GitHub</a>"
     <p>Data sources: <a href="https://www.pik-potsdam.de/carbonclock">PIK Potsdam Carbon Clock</a></p>
     
-    <script>
+    <script type="module">
+      // Add in test data
+      import { defaultCalculatorInputs, USE_DEFAULT_DATA_FOR_TESTING } from './testData.js';
+
+      if (USE_DEFAULT_DATA_FOR_TESTING) {
+        document.getElementById("diet").value = defaultCalculatorInputs.diet;
+        document.getElementById("bread").value = defaultCalculatorInputs.bread;
+        document.getElementById("produce").value = defaultCalculatorInputs.produce;
+        document.getElementById("meat").value = defaultCalculatorInputs.meat;
+        document.getElementById("electricity").value = defaultCalculatorInputs.electricity;
+        document.getElementById("gas").value = defaultCalculatorInputs.gas;
+        document.getElementById("water").value = defaultCalculatorInputs.water;
+        document.getElementById("waterEI").value = defaultCalculatorInputs.waterEI;
+      }
+
+
+
+
+
       // Transport entries management. I don't really understand it. TODO: learn what it is becasuse some code might not be necessary.
       let transportEntries = [];
       let nextTransportId = 1;
@@ -362,10 +380,18 @@
         const kWh = parseFloat(document.getElementById("electricity").value) || 0;
         const m3Gas = parseFloat(document.getElementById("gas").value) || 0;
         const litersWater = parseFloat(document.getElementById("water").value) || 0;
+
+        // Get country and region from the DOM
+        const country = document.getElementById("country").value;
+        const region = document.getElementById("region").value;
+
         //Convert inputs to yearly emissions
         const yearlykWh = convertToYearly(timeframe, kWh);
         const yearlyGas = convertToYearly(timeframe, m3Gas);
         const yearlyWater = convertToYearly(timeframe, litersWater);
+        console.log(
+          `Yearly kWh: ${yearlykWh}, Yearly Gas: ${yearlyGas}, Yearly Water: ${yearlyWater}`
+        );
         //Get region's electricity, gas, and water CO2e intensities
         const regionInfo = regionData[country]?.regions?.[region];
         const electricityIntensity = regionInfo.gCO2e_kWh * 0.001;
@@ -378,7 +404,7 @@
         //I had to ask for user input as its highly local :( 
         // TODO: compile a list of water EI values for different regions
         const waterEI = parseFloat(document.getElementById("waterEI").value) || 0; 
-        const waterCO2e = yearlyM3Water * (WaterEI * electricityIntensity + 0.03);
+        const waterCO2e = yearlyM3Water * (waterEI * electricityIntensity + 0.03);
 
 
         //const gasIntensity = regionData[country].regions[region].gas;
@@ -387,6 +413,8 @@
         const gasIntensity = 0.5; // kg CO2e per m3
         const waterIntensity = 0.1; // kg CO2e per liter
         const gasCO2e = yearlyGas * gasIntensity; //TODO: THIS IS A PLACEHOLDER VALUE, DO NOT USE IT IN PRODUCTION
+
+
         const totalUtilityCO2e = electricityCO2e + waterCO2e + gasCO2e;
         return totalUtilityCO2e;
       }
@@ -458,6 +486,7 @@
         // Gas CO2e/m3
         
         utilitiesCO2e = calcUtilities();
+        console.log("Utilities CO2e: " + utilitiesCO2e);
         foodwasteCO2e = calcFoodWaste();
         compostAvoidedCO2e = calcCompostAvoided();
 
