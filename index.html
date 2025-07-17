@@ -165,23 +165,7 @@
     <p>Source code: <a href="https://github.com/electricwapiti/Carbon-footprint-calculator">GitHub</a>"
     <p>Data sources: <a href="https://www.pik-potsdam.de/carbonclock">PIK Potsdam Carbon Clock</a></p>
     
-    <script type="module">
-      // Add in test data
-      import { defaultCalculatorInputs, USE_DEFAULT_DATA_FOR_TESTING } from './testData.js';
-
-      if (USE_DEFAULT_DATA_FOR_TESTING) {
-        document.getElementById("diet").value = defaultCalculatorInputs.diet;
-        
-        document.getElementById("electricity").value = defaultCalculatorInputs.electricity;
-        document.getElementById("gas").value = defaultCalculatorInputs.gas;
-        document.getElementById("water").value = defaultCalculatorInputs.water;
-        document.getElementById("waterEI").value = defaultCalculatorInputs.waterEI;
-      }
-
-
-
-
-
+    <script>
       // Transport entries management. I don't really understand it. TODO: learn what it is becasuse some code might not be necessary.
       let transportEntries = [];
       let nextTransportId = 1;
@@ -549,11 +533,11 @@
       }
 
       // Update the timeframe text when the page loads
-      document.addEventListener("DOMContentLoaded", function () {
+      /* document.addEventListener("DOMContentLoaded", function () {
         const selectElement = document.getElementById("utilities_timeframe");
       updateTimeframe(selectElement);
       
-  });
+  });*/
     </script>
   </body>
 </html>
