@@ -262,6 +262,9 @@
         entryDiv.id = `diet-${id}`;
 
         entryDiv.innerHTML = `
+        <label>Name:
+          <input type="text" placeholder="Name" onchange="updateDietName(${id}, this.value)">
+          </label>
             <label>Diet:
               <select onchange="updateDietType(${id}, this.value)">
                 <option value="high_meat">High Meat Eater</option>
@@ -285,8 +288,19 @@
 
       function updateDietType(id, value) {
         console.log(`Diet ${id} set to: ${value}`);
+        //TODO: Save or process the new diet type here as needed
       }
 
+      function updateDietName(id, value) {
+        console.log(`Diet ${id} name updated to: ${value}`);
+        // TODO: Save or process the new name here as needed
+      }
+
+      function updateDietCalories(id, value) {
+        console.log(`Diet ${id} calories updated to: ${value}`);
+        // TODO: Save or process the new calories here as needed
+      }
+      
       function removeDietEntry(id) {
         const el = document.getElementById(`diet-${id}`);
         if (el) el.remove();
