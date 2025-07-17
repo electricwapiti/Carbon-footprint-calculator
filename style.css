@@ -100,10 +100,21 @@ body {
     display: flex;
     gap: 1rem;
     align-items: center;
-    flex-wrap: wrap; /* allows wrapping on smaller screens */
+    flex-wrap: nowrap;
     background-color: #b1cf5fff; /* yellow-green */
-    
-    padding: 1 rem 2 rem;
+    padding: 0.1rem 1rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin: 1rem 0;
+}
+
+.diet-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: nowrap;
+    background-color: #b1cf5fff; /* yellow-green */
+    padding: 0.1rem 1rem;
     border-radius: 50px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     margin: 1rem 0;

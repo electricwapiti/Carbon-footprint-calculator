@@ -33,15 +33,8 @@
     <div class="inline-field">
       <h2>Diet</h2>
     </div>
-    <label for="diet">Select your diet:</label>
-    <select id="diet" onchange="updateFoodFootprint()">
-      <option value="high_meat">High Meat Eater</option>
-      <option value="average" selected>Average</option>
-      <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
-      <option value="pescitarian_wo_s">Pescitarian w/o shrimp</option>
-      <option value="vegetarian">Vegetarian</option>
-      <option value="vegan">Vegan</option>
-    </select>
+    <button type="button" class="button" onclick="addDietEntry()">Add Diet</button>
+    <div id="diet-container"></div>
 
     <!-- Food Waste -->
     <div class="inline-field">
@@ -255,6 +248,48 @@
         } else {
           carInputs.style.display = "none";
         }
+      }
+
+      // Diet entries management.
+      // TODO: Treat diet entries as an array of objects including type, calories, and id. 
+      // Use this to sum up the emissions of an entire household.
+      let dietIdCounter = 0;
+      function addDietEntry() {
+        const id = dietIdCounter++;
+        const container = document.getElementById("diet-container");
+        const entryDiv = document.createElement("div");
+        entryDiv.className = "diet-row";
+        entryDiv.id = `diet-${id}`;
+
+        entryDiv.innerHTML = `
+            <label>Diet:
+              <select onchange="updateDietType(${id}, this.value)">
+                <option value="high_meat">High Meat Eater</option>
+                <option value="average" selected>Average</option>
+                <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
+                <option value="pescitarian_wo_s">Pescitarian w/o shrimp</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+              </select>
+            </label>
+
+              <label>
+                Calories/day (kcal):
+                <input type="number" onchange="updateDietCalories(${id}, this.value)">
+              </label>
+
+            <button type="button" class="button delete-button" onclick="removeDietEntry(${id})">X</button>
+        `;
+        container.appendChild(entryDiv);
+      }
+
+      function updateDietType(id, value) {
+        console.log(`Diet ${id} set to: ${value}`);
+      }
+
+      function removeDietEntry(id) {
+        const el = document.getElementById(`diet-${id}`);
+        if (el) el.remove();
       }
 
       // Keep all the timeframe text in sync with the selected option
