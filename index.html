@@ -604,7 +604,7 @@
           transportCO2e +
           utilitiesCO2e +
           dietCO2e +
-          foodwasteCO2e -
+          foodwasteCO2e +
           compostAvoidedCO2e;
         document.getElementById("result").innerHTML = `
             <section class="result-section">
@@ -617,7 +617,7 @@
                 Emissions from food waste: <span class="calc-value">${foodwasteCO2e.toFixed(
                   2
                 )} kg CO₂e</span><br/>
-                Emissions avoided by extra composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(
+                Emissions from extra composting: <span class="calc-value">${compostAvoidedCO2e.toFixed(
                   2
                 )} kg CO₂e</span><br/>
                 Emissions from diet: <span class="calc-value">${dietCO2e.toFixed(
