@@ -7,12 +7,38 @@
       href="https://fonts.cdnfonts.com/css/atkinson-hyperlegible"
       rel="stylesheet"
     />
+    <!-- Bootstrap -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
     <title>Carbon Footprint Calculator</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <h1>Carbon Footprint Estimator</h1>
     <!-- Transport -->
+     <nav class="navbar navbar-inverse visible-xs">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>                        
+          </button>
+          <a class="navbar-brand" href="#">Logo</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Dashboard</a></li>
+            <li><a href="#">Age</a></li>
+            <li><a href="#">Gender</a></li>
+            <li><a href="#">Geo</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
     <div class="inline-field">
       <h2>Transportation</h2>
       <p>Time length:</p>
@@ -341,10 +367,10 @@
 
         // Emissions factors in kg CO2e per km
         const emissionsPerKm = {
-          bus: 0.105, // average bus
-          train: 0.041, // average train
-          bike: 0, // bike
-          walk: 0, // walk
+          bus: 0.105,
+          train: 0.041,
+          bike: 0,
+          walk: 0,
         };
 
         let transportCO2e = 0;
@@ -552,7 +578,7 @@
         `;
       }
       function getRegionData() {
-        // 
+        // TODO: Implement a function to fetch and return region data
       }
       //Load & manage region CO2e emissions for utilities
       let regionData = {};
@@ -580,13 +606,6 @@
             regionSelect.appendChild(option);
         });
       }
-
-      // Update the timeframe text when the page loads
-      /* document.addEventListener("DOMContentLoaded", function () {
-        const selectElement = document.getElementById("utilities_timeframe");
-      updateTimeframe(selectElement);
-      
-  });*/
     </script>
   </body>
 </html>
