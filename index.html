@@ -47,12 +47,12 @@
         <option value="yearly">Yearly</option>
       </select>
     </div>
-    <div id="transportEntriesContainer"></div>
     <div style="margin-top: 0.5em; text-align: center">
       <button type="button" class="button" onclick="addTransportEntry()">
         Add mode of transport
       </button>
     </div>
+    <div id="transportEntriesContainer"></div>
 
     <!-- Diet(s) -->
     <div class="inline-field">
@@ -71,38 +71,34 @@
         <option value="yearly">Yearly</option>
       </select>
     </div>
-    <p>How much food waste do you throw away from your household?</p>
+    <p>How many kg of food waste do you throw away from your household?</p>
     <div class="inline-field">
-      <label for="bread">Bread (kg thrown away):</label>
-      <label for="produce">Produce (kg thrown away):</label>
-      <label for="meat">Meat (kg thrown away):</label>
+      <label for="bread">Bread:</label>
+      <input type="number" id="trash-bread-h" />
+      <label for="produce">Produce:</label>
+      <input type="number" id="trash-produce-h" />
+      <label for="meat">Meat:</label>
+      <input type="number" id="trash-meat-h" />
     </div>
     <div class="inline-field">
-      <input type="number" id="trash-bread" />
-      <input type="number" id="trash-produce" />
-      <input type="number" id="trash-meat" />
     </div>
-    <p>How much food waste do you compost from your household?</p>
+    <p>How many kg of food waste do you compost from your household?</p>
     <div class="inline-field">
-      <label for="bread">Bread (kg composted):</label>
-      <label for="produce">Produce (kg composted):</label>
-      <label for="meat">Meat (kg composted):</label>
+      <label for="bread">Bread:</label>
+      <input type="number" id="compost-bread-h" />
+      <label for="produce">Produce:</label>
+      <input type="number" id="compost-produce-h" />
+      <label for="meat">Meat:</label>
+      <input type="number" id="compost-meat-h" />
     </div>
+    <p>How many kg of food waste do you compost from outside your household?</p>
     <div class="inline-field">
-      <input type="number" id="bread" />
-      <input type="number" id="produce" />
-      <input type="number" id="meat" />
-    </div>
-    <p>How much food waste do you compost from outside your household?</p>
-    <div class="inline-field">
-      <label for="bread">Bread (kg composted):</label>
-      <label for="produce">Produce (kg composted):</label>
-      <label for="meat">Meat (kg composted):</label>
-    </div>
-    <div class="inline-field">
-      <input type="number" id="bread" />
-      <input type="number" id="produce" />
-      <input type="number" id="meat" />
+      <label for="bread">Bread:</label>
+      <input type="number" id="trash-bread-oh" />
+      <label for="produce">Produce:</label>
+      <input type="number" id="trash-produce-oh" />
+      <label for="meat">Meat:</label>
+      <input type="number" id="trash-meat-oh" />
     </div>
 
     <!-- Utilities -->
@@ -301,26 +297,28 @@
         entryDiv.className = "diet-entry";
         entryDiv.id = `diet-${id}`;
         entryDiv.innerHTML = `
-        <label>Name:
-          <input type="text" placeholder="Name" onchange="updateDietName(${id}, this.value)">
-          </label>
-            <label>Diet:
-              <select onchange="updateDietType(${id}, this.value)">
-                <option value="high_meat">High Meat Eater</option>
-                <option value="average" selected>Average</option>
-                <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
-                <option value="pescitarian_wo_s">Pescitarian w/o shrimp</option>
-                <option value="vegetarian">Vegetarian</option>
-                <option value="vegan">Vegan</option>
-              </select>
+        <div class="diet-row">
+          <label>Name:
+            <input type="text" placeholder="Name" onchange="updateDietName(${id}, this.value)">
             </label>
-
-              <label>
-                Calories/day (kcal):
-                <input type="number" onchange="updateDietCalories(${id}, this.value)">
+              <label>Diet:
+                <select onchange="updateDietType(${id}, this.value)">
+                  <option value="high_meat">High Meat Eater</option>
+                  <option value="average" selected>Average</option>
+                  <option value="pescitarian_w_s">Pescitarian w/ shrimp</option>
+                  <option value="pescitarian_wo_s">Pescitarian w/o shrimp</option>
+                  <option value="vegetarian">Vegetarian</option>
+                  <option value="vegan">Vegan</option>
+                </select>
               </label>
 
-            <button type="button" class="button delete-button" onclick="removeDietEntry(${id})">X</button>
+                <label>
+                  Calories/day (kcal):
+                  <input type="number" onchange="updateDietCalories(${id}, this.value)">
+                </label>
+
+              <button type="button" class="button delete-button" onclick="removeDietEntry(${id})">X</button>
+        </div>
         `;
         container.appendChild(entryDiv);
       }
@@ -333,8 +331,10 @@
       }
 
       function updateDietName(id, value) {
-        console.log(`Diet ${id} name updated to: ${value}`);
-        // TODO: Save or process the new name here as needed
+        const entry = dietEntries.find(e => e.id === id);
+        if (entry) {
+          entry.name = value;
+        }
       }
 
       function updateDietCalories(id, value) {
@@ -363,9 +363,7 @@
       }
 
       function calcDiet() {
-        // the timeframe is 1 day in the UI
-
-        //This timeframe is 1 week
+        // Timeframe is 1 day in the UI & 1 wk in the default emissions map.
         const dietEmissionsMap = {
           high_meat: 40,
           average: 25,
@@ -375,15 +373,12 @@
           vegan: 12,
         };
         
+        // Calculate and sum the total CO2e emissions for each diet entry.
         let dietCO2e = 0;
-
         for (const entry of dietEntries) {
           const dietType = entry.type;
           const calories = entry.calories || 0;
           const dietEmissions = dietEmissionsMap[dietType] || 0;
-          // Calculate the emissions based on the diet type and calories
-
-          // Assuming the emissions are per week, convert to kg CO2e per year
           const yearlyEmissions = convertToYearly("weekly", dietEmissions);
           dietCO2e += (yearlyEmissions * calories) / 2000;
         }
@@ -420,15 +415,34 @@
       function calcFoodWaste() {
         // Placeholder — you'd insert your actual calculation logic
         return 0; // or some calculated number
+        const breadTrash = parseFloat(document.getElementById("trash-bread-h").value) || 0;
+        const produceTrash = parseFloat(document.getElementById("trash-produce-h").value) || 0;
+        const meatTrash = parseFloat(document.getElementById("trash-meat-h").value) || 0;
+        const breadCompost = parseFloat(document.getElementById("compost-bread-h").value) || 0;
+        const produceCompost = parseFloat(document.getElementById("compost-produce-h").value) || 0;
+        const meatCompost = parseFloat(document.getElementById("compost-meat-h").value) || 0;
+
+        // CO2e emissions from food waste trash
+        const CH4_BREAD = 0.375;
+        const CH4_PRODUCE = 0.25;
+        const CH4_MEAT = 0.7;
+        const ESCAPE_FACTOR = 0.61;
+        const GWP_100yr = 28;
+        const trashCH4 =
+          (breadTrash * CH4_BREAD + produceTrash * CH4_PRODUCE + meatTrash * CH4_MEAT) *
+          ESCAPE_FACTOR;
+        let trashCO2e = trashCH4 * GWP_100yr;
+
+        // CO2e emissions from food waste compost
+        const CO2_Bread =  0.06
       }
 
       // Calculate the CO2e emissions avoided by composting food waste from outside the household.
       // This is a societal emission reduction opportunity. TODO: add more opportunities (e.g. activism, lobbying, voting, donating, etc.) if you think of any.
       function calcCompostAvoided() {
-        const bread = parseFloat(document.getElementById("bread").value) || 0;
-        const produce =
-          parseFloat(document.getElementById("produce").value) || 0;
-        const meat = parseFloat(document.getElementById("meat").value) || 0;
+        const breadCompostOH = parseFloat(document.getElementById("trash-bread-oh").value) || 0;
+        const produceCompostOH = parseFloat(document.getElementById("trash-produce-oh").value) || 0;
+        const meatCompostOH = parseFloat(document.getElementById("trash-meat-oh").value) || 0;
 
         // Composting benefit: 100 yr CO2e of methane avoided
         const CH4_BREAD = 0.375;
@@ -438,7 +452,7 @@
         const GWP_100yr = 28;
 
         const compostCH4 =
-          (bread * CH4_BREAD + produce * CH4_PRODUCE + meat * CH4_MEAT) *
+          (breadCompostOH * CH4_BREAD + produceCompostOH * CH4_PRODUCE + meatCompostOH * CH4_MEAT) *
           ESCAPE_FACTOR;
 
         let compostAvoidedCO2e = compostCH4 * GWP_100yr;
