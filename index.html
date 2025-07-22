@@ -59,7 +59,7 @@
       <h2>Diet</h2>
     </div>
     <button type="button" class="button" onclick="addDietEntry()">Add Diet</button>
-    <div id="diet-container"></div>
+    <div id="dietEntriesContainer"></div>
 
     <!-- Food Waste -->
     <div class="inline-field">
@@ -184,9 +184,9 @@
     <p>Data sources: <a href="https://www.pik-potsdam.de/carbonclock">PIK Potsdam Carbon Clock</a></p>
     
     <script>
-      // Transport entries management. I don't really understand it. TODO: learn what it is becasuse some code might not be necessary.
+      // Transport entries management.
       let transportEntries = [];
-      let nextTransportId = 1;
+      let nextTransportId = 0;
       function addTransportEntry() {
         const container = document.getElementById("transportEntriesContainer");
         const id = nextTransportId++;
@@ -278,14 +278,28 @@
       // Diet entries management.
       // TODO: Treat diet entries as an array of objects including type, calories, and id. 
       // Use this to sum up the emissions of an entire household.
+      let dietEntries = [];
       let dietIdCounter = 0;
       function addDietEntry() {
+        
+        //wire the select, input and delete buttons to the correct functions
+        //timeframe is updated by select element
+        
+        // Create a new default diet entry in the array
+        const container = document.getElementById("dietEntriesContainer");
         const id = dietIdCounter++;
-        const container = document.getElementById("diet-container");
-        const entryDiv = document.createElement("div");
-        entryDiv.className = "diet-row";
-        entryDiv.id = `diet-${id}`;
+        const entry = {
+          id,
+          type: "average",
+          name: "",
+          calories: 0,
+        };
+        dietEntries.push(entry);
 
+        // Create a new diet entry in the UI with a div
+        const entryDiv = document.createElement("div");
+        entryDiv.className = "diet-entry";
+        entryDiv.id = `diet-${id}`;
         entryDiv.innerHTML = `
         <label>Name:
           <input type="text" placeholder="Name" onchange="updateDietName(${id}, this.value)">
@@ -312,8 +326,10 @@
       }
 
       function updateDietType(id, value) {
-        console.log(`Diet ${id} set to: ${value}`);
-        //TODO: Save or process the new diet type here as needed
+        const entry = dietEntries.find(e => e.id === id);
+        if (entry) {
+          entry.type = value;
+        }
       }
 
       function updateDietName(id, value) {
@@ -322,8 +338,10 @@
       }
 
       function updateDietCalories(id, value) {
-        console.log(`Diet ${id} calories updated to: ${value}`);
-        // TODO: Save or process the new calories here as needed
+        const entry = dietEntries.find(e => e.id === id);
+        if (entry) {
+          entry.calories = parseFloat(value) || 0;
+        }
       }
       
       function removeDietEntry(id) {
@@ -344,10 +362,10 @@
           });
       }
 
-      //TODO: Make an array of diets and portion sizes (small, med, large). Use this to sum up the emissions of an entire household.
       function calcDiet() {
-        const dietValue = document.getElementById("diet").value;
+        // the timeframe is 1 day in the UI
 
+        //This timeframe is 1 week
         const dietEmissionsMap = {
           high_meat: 40,
           average: 25,
@@ -356,8 +374,19 @@
           vegetarian: 15,
           vegan: 12,
         };
+        
+        let dietCO2e = 0;
 
-        let dietCO2e = dietEmissionsMap[dietValue] || 0;
+        for (const entry of dietEntries) {
+          const dietType = entry.type;
+          const calories = entry.calories || 0;
+          const dietEmissions = dietEmissionsMap[dietType] || 0;
+          // Calculate the emissions based on the diet type and calories
+
+          // Assuming the emissions are per week, convert to kg CO2e per year
+          const yearlyEmissions = convertToYearly("weekly", dietEmissions);
+          dietCO2e += (yearlyEmissions * calories) / 2000;
+        }
         return dietCO2e;
       }
 
@@ -526,7 +555,7 @@
         //Verify that the user set enough data to calculate a footprint
         if (
           transportEntries.length === 0 ||
-          document.getElementById("diet").value === "" ||
+          dietEntries.length === 0 ||
           document.getElementById("utilities_timeframe").value === "" ||
           document.getElementById("country").value === "" ||
           document.getElementById("region").value === ""
