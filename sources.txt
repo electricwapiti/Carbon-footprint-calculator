@@ -1,0 +1,38 @@
+This is how I found the numbers for the calculator.
+
+Household emissions
+a. Food waste emissions
+1. Landfill emissions
+In a landfill, food waste anaerobically decomposes into methane at certain rates. The numbers are from a search with ChatGPT.
+
+CH4_BREAD = 0.375;     <-- ChatGPT
+CH4_PRODUCE = 0.25;    <-- ChatGPT
+CH4_MEAT = 0.7;        <-- ChatGPT
+ESCAPE_FACTOR = 0.61; <-- From a Google search
+GWP_100yr = 28;        <-- Standard 100 yr global warming potential of methane compared to CO2.
+
+Produce emits 0.1525 kg methane / 1 kg landfilled -> 4.3 kg CO2e / 1 kg landfilled
+Bread emits .22875 kg methane / 1 kg landfilled -> 6.4 kg CO2e / 1 kg landfilled
+Meat emits .427 kg methane / 1 kg landfilled -> 12 kg CO2e / 1 kg landfilled
+
+2. Composting emissions
+In a composter, food waste aerobically decomposes into CO2 at a certain rate.
+
+kg CO2 per kg of material composted: 0.06
+Source (.bib): 
+@article{doi:10.1021/acs.est.2c05846,
+        author = {Nordahl, Sarah L. and Preble, Chelsea V. and Kirchstetter, Thomas W. and Scown, Corinne D.},
+        title = {Greenhouse Gas and Air Pollutant Emissions from Composting},
+        journal = {Environmental Science \& Technology},
+        volume = {57},
+        number = {6},
+        pages = {2235-2247},
+        year = {2023},
+        doi = {10.1021/acs.est.2c05846},
+        note ={PMID: 36719708},
+        URL = {https://doi.org/10.1021/acs.est.2c05846},
+        eprint = {https://doi.org/10.1021/acs.est.2c05846}
+}
+
+methane emission factor: 3% of landfill methane emissions <-- ChatGPT
+soil carbon storage: 0.2 kg CO2e stored per kg of compost applied <-- ChatGPT

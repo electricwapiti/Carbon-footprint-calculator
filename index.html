@@ -16,6 +16,7 @@
   </head>
   <body>
     <h1>Carbon Footprint Estimator</h1>
+    <button class="button" onclick="fillTestData()">Fill Test Data</button>
     <!-- Transport -->
      <nav class="navbar navbar-inverse visible-xs">
       <div class="container-fluid">
@@ -413,8 +414,7 @@
       }
 
       function calcFoodWaste() {
-        // Placeholder — you'd insert your actual calculation logic
-        return 0; // or some calculated number
+        // Collect the values from user input
         const breadTrash = parseFloat(document.getElementById("trash-bread-h").value) || 0;
         const produceTrash = parseFloat(document.getElementById("trash-produce-h").value) || 0;
         const meatTrash = parseFloat(document.getElementById("trash-meat-h").value) || 0;
@@ -422,19 +422,26 @@
         const produceCompost = parseFloat(document.getElementById("compost-produce-h").value) || 0;
         const meatCompost = parseFloat(document.getElementById("compost-meat-h").value) || 0;
 
-        // CO2e emissions from food waste trash
-        const CH4_BREAD = 0.375;
+        // Anaerobic decomposition of food waste:
         const CH4_PRODUCE = 0.25;
+        const CH4_BREAD = 0.375;
         const CH4_MEAT = 0.7;
-        const ESCAPE_FACTOR = 0.61;
-        const GWP_100yr = 28;
-        const trashCH4 =
-          (breadTrash * CH4_BREAD + produceTrash * CH4_PRODUCE + meatTrash * CH4_MEAT) *
-          ESCAPE_FACTOR;
-        let trashCO2e = trashCH4 * GWP_100yr;
 
+        // Aerobic decomposition of food waste:
+        const CO2_FOODWASTE = 0.06; // kg CO2 emitted per kg of food waste
+
+        // CO2e emissions from food waste trash
+        const ESCAPE_FACTOR = 0.61; // 61% of landfilled methane escapes to atmosphere
+        const GWP_100yr = 28;
+        const trashCO2e = (breadTrash * CH4_BREAD + produceTrash * CH4_PRODUCE + meatTrash * CH4_MEAT) * ESCAPE_FACTOR * GWP_100yr;
+        
         // CO2e emissions from food waste compost
-        const CO2_Bread =  0.06
+        const propAnaerobic = 0.03;
+        const carbonStorage = 0.1; //kg CO2e of compost applied per kg of food waste composted (compost is half of the mass of food waste)
+        const compost_CH4_CO2e = (breadCompost * CH4_BREAD + produceCompost * CH4_PRODUCE + meatCompost * CH4_MEAT) * GWP_100yr * ESCAPE_FACTOR * propAnaerobic;
+        const compostCO2e = (breadCompost + produceCompost + meatCompost) * (CO2_FOODWASTE - carbonStorage) + compost_CH4_CO2e;
+        const foodwasteCO2e = trashCO2e + compostCO2e;
+        return foodwasteCO2e;
       }
 
       // Calculate the CO2e emissions avoided by composting food waste from outside the household.
@@ -444,27 +451,31 @@
         const produceCompostOH = parseFloat(document.getElementById("trash-produce-oh").value) || 0;
         const meatCompostOH = parseFloat(document.getElementById("trash-meat-oh").value) || 0;
 
-        // Composting benefit: 100 yr CO2e of methane avoided
+        // Landfill anaerobic decomposition of food waste
         const CH4_BREAD = 0.375;
         const CH4_PRODUCE = 0.25;
         const CH4_MEAT = 0.7;
         const ESCAPE_FACTOR = 0.61; // 61% escapes
         const GWP_100yr = 28;
 
-        const compostCH4 =
-          (breadCompostOH * CH4_BREAD + produceCompostOH * CH4_PRODUCE + meatCompostOH * CH4_MEAT) *
-          ESCAPE_FACTOR;
+        // CO2e emissions from food waste compost
+        const CO2_FOODWASTE = 0.06; // kg CO2 emitted per kg of food waste composted
+        const propAnaerobic = 0.03;
+        const carbonStorage = 0.1; //kg CO2e of compost applied per kg of food waste composted (compost is half of the mass of food waste)
+        const compost_CH4_CO2e = (breadCompostOH * CH4_BREAD + produceCompostOH * CH4_PRODUCE + meatCompostOH * CH4_MEAT) * GWP_100yr * ESCAPE_FACTOR * propAnaerobic;
+        const compostCO2e = (breadCompostOH + produceCompostOH + meatCompostOH) * (CO2_FOODWASTE - carbonStorage) + compost_CH4_CO2e;
+        
+        // CO2e emissions from diversion from landfill
+        const noTrashCO2e = - (breadCompostOH * CH4_BREAD + produceCompostOH * CH4_PRODUCE + meatCompostOH * CH4_MEAT) * ESCAPE_FACTOR * GWP_100yr;
 
-        let compostAvoidedCO2e = compostCH4 * GWP_100yr;
+        // total CO2e avoided per user-specified timeframe via extra composting
+        const avoidedCO2e = noTrashCO2e + compostCO2e;
 
-        //Find the selected timeframe and multiply it by that.
-        const foodwasteTimeframe = document.getElementById(
-          "foodwaste_timeframe"
-        ).value;
-        const yearlyEmissions = convertToYearly(foodwasteTimeframe);
-        console.log("the food waste yearly emissions is" + yearlyEmissions);
-        compostAvoidedCO2e = yearlyEmissions;
-        return compostAvoidedCO2e;
+        // Convert avoided CO2e to yearly CO2e
+        const foodwasteTimeframe = document.getElementById("foodwaste_timeframe").value;
+        const yearlyAvoidedCO2e = convertToYearly(foodwasteTimeframe, avoidedCO2e);
+        console.log("the food waste avoided yearly emissions is" + yearlyAvoidedCO2e);
+        return yearlyAvoidedCO2e;
       }
 
       function calcUtilities() {
@@ -648,6 +659,64 @@
             regionSelect.appendChild(option);
         });
       }
+
+      // Fill test data
+      function fillTestData() {
+      // Transport
+      transportEntries = [];
+      document.getElementById("transportEntriesContainer").innerHTML = "";
+      addTransportEntry();
+      const entry = transportEntries[0];
+      updateTransportMode(entry.id, "car");
+      updateTransportDistance(entry.id, 100);
+      updateTransportFuel(entry.id, 10);
+      document.querySelector(`#transport-${entry.id} input[type="number"]`).value = 100;
+      document.querySelector(`#fuel-eff-${entry.id} input[type="number"]`).value = 10;
+
+      // Diet
+      dietEntries = [];
+      document.getElementById("dietEntriesContainer").innerHTML = "";
+      addDietEntry();
+      const dietEntry = dietEntries[0];
+      updateDietName(dietEntry.id, "U. N. Owen");
+      updateDietType(dietEntry.id, "high_meat");
+      updateDietCalories(dietEntry.id, 3900);
+      document.querySelector(`#diet-${dietEntry.id} input[type="text"]`).value = "U. N. Owen";
+      document.querySelector(`#diet-${dietEntry.id} select`).value = "high_meat";
+      document.querySelector(`#diet-${dietEntry.id} input[type="number"]`).value = 3900;
+
+      // Food Waste
+      document.getElementById("trash-bread-h").value = 3;
+      document.getElementById("trash-produce-h").value = 1;
+      document.getElementById("trash-meat-h").value = 5;
+      document.getElementById("compost-bread-h").value = 0;
+      document.getElementById("compost-produce-h").value = 0;
+      document.getElementById("compost-meat-h").value = 0;
+      document.getElementById("trash-bread-oh").value = 0;
+      document.getElementById("trash-produce-oh").value = 0;
+      document.getElementById("trash-meat-oh").value = 0;
+
+      // Utilities
+      document.getElementById("utilities_timeframe").value = "monthly";
+      updateTimeframe(document.getElementById("utilities_timeframe"));
+
+      document.getElementById("electricity").value = 3000;
+      document.getElementById("gas").value = 3;
+      document.getElementById("water").value = 3000;
+      document.getElementById("waterEI").value = 1;
+
+      // Country and Region
+      document.getElementById("country").value = "USA";
+      updateRegions();
+
+      // Delay region selection slightly to allow updateRegions() to populate the list
+      setTimeout(() => {
+        const regionSelect = document.getElementById("region");
+        if (regionSelect.options.length > 1) {
+          regionSelect.selectedIndex = 1; // Select the first actual region
+        }
+      }, 100); // May need to adjust this depending on region data load time
+    }
     </script>
   </body>
 </html>
