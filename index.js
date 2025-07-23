@@ -692,14 +692,53 @@ function fillTestData() {
     }, 100); // May need to adjust this depending on region data load time
 }
 
+// TODO: Delete later
 function testFunction(){
     console.log("Test function called");
+
     const buttons = document.getElementsByClassName("button");
     for (let i = 0; i < buttons.length; i++) {
-        buttons[i].style.backgroundColor = "red";
+        buttons[i].style.color = "red";
     }
-    document.querySelectorAll(".list-item").forEach(item => {
-        item.style.color = "blue";
+
+    document.querySelectorAll("button").forEach(button => {
+        button.style.backgroundColor = "black";
+    });
+    
+    document.querySelectorAll("h2").forEach(item => {
+        if(item.style.color === "gray") {
+            item.style.color = "black";
+        } else {
+            item.style.color = "gray";
+            item.style.backgroundColor = "lightgray";
+        }
+    });
+
+    btns = document.querySelector("button").classList;
+    console.log("Button classes: ", btns);
+    btns.forEach(btn => {
+        console.log("Button class: ", btn);
     }
     );
+
+    document.querySelectorAll("button").forEach( btn => {
+        console.log("this is another button:");
+        console.log(btn);
+    });
+
+    document.querySelectorAll("h1").forEach(div => {
+        div.classList.add("huge");
+    });
+
+    document.querySelectorAll("p").forEach(div => {
+        if(div.classList.contains("invisible")) {
+            div.classList.remove("invisible");
+        }
+        else {
+            div.classList.add("invisible");
+        }
+    });
+
+    document.querySelector("h1").innerHTML = "<em>Good Bye</em>";
+    document.querySelector("p").setAttribute("href", "https://www.bing.com");
 }
