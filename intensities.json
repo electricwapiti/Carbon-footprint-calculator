@@ -158,7 +158,30 @@
     "CAN": {
       "name": "Canada",
       "regions": {
-
+        "Alberta": {
+          "gCO2e_kWh": 540
+        },
+        "British Columbia": {
+          "gCO2e_kWh": 15
+        },
+        "Manitoba": {
+          "gCO2e_kWh": 2.0
+        },
+        "New Brunswick": {
+          "gCO2e_kWh": 300
+        },
+        "Nova Scotia": {
+          "gCO2e_kWh": 690
+        },
+        "Ontario": {
+          "gCO2e_kWh": 30
+        },
+        "Quebec": {
+          "gCO2e_kWh": 1.7
+        },
+        "Saskatchewan": {
+          "gCO2e_kWh": 730
+        }
       }
     },
     "MEX": {
