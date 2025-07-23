@@ -370,7 +370,11 @@ function calcFoodWaste() {
     const compost_CH4_CO2e = (breadCompost * CH4_BREAD + produceCompost * CH4_PRODUCE + meatCompost * CH4_MEAT) * GWP_100yr * ESCAPE_FACTOR * propAnaerobic;
     const compostCO2e = (breadCompost + produceCompost + meatCompost) * (CO2_FOODWASTE - carbonStorage) + compost_CH4_CO2e;
     const foodwasteCO2e = trashCO2e + compostCO2e;
-    return foodwasteCO2e;
+    
+    // Convert CO2e to yearly CO2e
+    const foodwasteTimeframe = document.getElementById("foodwaste_timeframe").value; 
+    const yearlyCO2e = convertToYearly(foodwasteTimeframe, foodwasteCO2e);
+    return yearlyCO2e;
 }
 
 
@@ -686,4 +690,16 @@ function fillTestData() {
         regionSelect.selectedIndex = 1; // Select the first actual region
     }
     }, 100); // May need to adjust this depending on region data load time
+}
+
+function testFunction(){
+    console.log("Test function called");
+    const buttons = document.getElementsByClassName("button");
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style.backgroundColor = "red";
+    }
+    document.querySelectorAll(".list-item").forEach(item => {
+        item.style.color = "blue";
+    }
+    );
 }
